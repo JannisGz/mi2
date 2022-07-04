@@ -57,6 +57,47 @@ struct ContentView: View {
             .padding()
             .background(Color.accentColor)
             .cornerRadius(8)
+            
+            Button(action: {
+                UserDefaultsProvider.setValueInUserDefaults(key: "serverAddress", value: self.serverAddress)
+                UserDefaultsProvider.setValueInUserDefaults(key: "patientReference", value: self.patientReference)
+                HKAuthorizer.authorizeHealthKit(completion: { (success, error) in
+                    let weightType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass)!
+                    let weightAnchor = HKAnchorProvider.GetAnchor(forType: weightType)
+                    HKSynchronizer().Synchronize(type: weightType, predicate: nil, anchor: weightAnchor, limit: HKObjectQueryNoLimit) { (success) in
+                        if (success) {
+                            print("All records synchronized")
+                        } else {
+                            print("There was an error during synchronization")
+                        }
+                    }
+                    
+                    let heightType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.height)!
+                    let heightAnchor = HKAnchorProvider.GetAnchor(forType: heightType)
+                    HKSynchronizer().Synchronize(type: heightType, predicate: nil, anchor: heightAnchor, limit: HKObjectQueryNoLimit) { (success) in
+                        if (success) {
+                            print("All records synchronized")
+                        } else {
+                            print("There was an error during synchronization")
+                        }
+                    }
+                    
+                    //let dobType = HKCharacteristicType.characteristicType(forIdentifier: HKCharacteristicTypeIdentifier.dateOfBirth)!
+                    //HKSynchronizer().Synchronize(type: dobType, predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit) { (success) in
+                    //    if (success) {
+                    //        print("All records synchronized")
+                    //    } else {
+                    //        print("There was an error during synchronization")
+                    //    }
+                    //}
+                })
+                
+            }) {
+                Text("Synchronize Patient Data")
+            }.foregroundColor(.white)
+            .padding()
+            .background(Color.accentColor)
+            .cornerRadius(8)
         }
     }
 }

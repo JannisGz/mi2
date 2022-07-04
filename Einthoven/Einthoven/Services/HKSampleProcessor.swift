@@ -29,16 +29,26 @@ class HKSampleProcessor {
         for sample in samples {
             self.processingDispatchGroup.enter()
             
-            let ecgSample = sample as! HKElectrocardiogram
+            print(sample.sampleType)
             
-            HKEcgVoltageProvider().GetMeasurementsForHKElectrocardiogram(sample: ecgSample) { (measurements) in
-                let observation = self.CreateObservation(measurements: measurements)
+            if (sample.sampleType == HKObjectType.electrocardiogramType()){
+            
+                let ecgSample = sample as! HKElectrocardiogram
                 
-                self.accessQueue.async(flags:.barrier) {
-                    self.resources.append(observation)
-                    self.processingDispatchGroup.leave()
+                HKEcgVoltageProvider().GetMeasurementsForHKElectrocardiogram(sample: ecgSample) { (measurements) in
+                    let observation = self.CreateObservation(measurements: measurements)
+                    
+                    self.accessQueue.async(flags:.barrier) {
+                        self.resources.append(observation)
+                        self.processingDispatchGroup.leave()
+                    }
                 }
             }
+            if (sample.sampleType == HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass)){
+                print(sample)
+                
+            }
+            print(sample)
         }
         
         self.processingDispatchGroup.notify(queue: .main) {

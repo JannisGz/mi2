@@ -12,7 +12,7 @@ class HKAuthorizer {
     static func authorizeHealthKit(completion: @escaping (Bool, Error?) -> Swift.Void) {
         
         print("Attempting to authorize HealthKit for ECG type")
-        let types: Set = [HKObjectType.electrocardiogramType()]
+        let types: Set = [HKObjectType.electrocardiogramType(), HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass)!, HKCharacteristicType.characteristicType(forIdentifier: HKCharacteristicTypeIdentifier.dateOfBirth)!, HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.height)!]
         
         // Request access
         HKHealthStore().requestAuthorization(toShare: nil,

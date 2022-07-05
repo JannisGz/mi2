@@ -93,5 +93,89 @@
             ],
             "text": "classification"
         }
-    }
+    },
+    "bodyMassTemplate": {
+        "resourceType": "Observation",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Body Weight"
+            },
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "display": "Body weight Measured"
+            },
+            {
+              "system": "http://snomed.info/sct",
+              "code": "27113001",
+              "display": "Body weight"
+            },
+            {
+              "system": "http://acme.org/devices/clinical-codes",
+              "code": "body-weight",
+              "display": "Body Weight"
+            }
+          ]
+        },
+        "subject": {
+          "reference": ""
+        },
+        "valueQuantity": {
+          "value": 0,
+          "unit": "",
+          "system": "http://unitsofmeasure.org",
+          "code": ""
+        }
+      },
+    "heightTemplate": {
+        "resourceType": "Observation",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "display": "Body height"
+            }
+          ],
+          "text": "Body height"
+        },
+        "subject": {
+          "reference": ""
+        },
+        "valueQuantity": {
+          "value": 0,
+          "unit": "",
+          "system": "http://unitsofmeasure.org",
+          "code": ""
+        }
+      }
+    
 }

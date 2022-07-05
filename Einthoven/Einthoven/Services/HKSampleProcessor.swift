@@ -36,7 +36,7 @@ class HKSampleProcessor {
                 let ecgSample = sample as! HKElectrocardiogram
                 
                 HKEcgVoltageProvider().GetMeasurementsForHKElectrocardiogram(sample: ecgSample) { (measurements) in
-                    let observation = self.CreateObservation(measurements: measurements)
+                    let observation = self.CreateObservationECG(measurements: measurements)
                     
                     self.accessQueue.async(flags:.barrier) {
                         self.resources.append(observation)
@@ -45,10 +45,23 @@ class HKSampleProcessor {
                 }
             }
             if (sample.sampleType == HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass)){
-                print(sample)
+                let content = sample.description.split(separator: " ")
+                let observation = self.CreateObservationQuantity(value: String(content[0]), unit: String(content[1]), t: "bodyMass")
+                self.accessQueue.async(flags:.barrier) {
+                    self.resources.append(observation)
+                    self.processingDispatchGroup.leave()
+                }
                 
             }
-            print(sample)
+            if (sample.sampleType == HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.height)){
+                let content = sample.description.split(separator: " ")
+                let observation = self.CreateObservationQuantity(value: String(content[0]), unit: String(content[1]), t: "height")
+                self.accessQueue.async(flags:.barrier) {
+                    self.resources.append(observation)
+                    self.processingDispatchGroup.leave()
+                }
+                
+            }
         }
         
         self.processingDispatchGroup.notify(queue: .main) {
@@ -62,9 +75,23 @@ class HKSampleProcessor {
         }
     }
     
-    private func CreateObservation(measurements: String) -> Observation {
-        let observation = EcgObservationTemplateProvider.GetObservationTemplate()
+    private func CreateObservationECG(measurements: String) -> Observation {
+        let observation = TemplateProvider.GetObservationTemplate(t: "ECG")
         observation.component?.first?.valueSampledData?.data = FHIRString(measurements)
+        
+        var reference = "Patient/"
+        let referenceValue = UserDefaultsProvider.getValueFromUserDefaults(key: "patientReference")
+        if (referenceValue != nil) {
+            reference += referenceValue!
+        }
+        observation.subject?.reference = FHIRString(reference)
+        return observation
+    }
+    
+    private func CreateObservationQuantity(value: String, unit: String, t: String) -> Observation {
+        let observation = TemplateProvider.GetObservationTemplate(t: t)
+        observation.valueQuantity?.value = FHIRDecimal(value)
+        observation.valueQuantity?.unit = FHIRString(unit)
         
         var reference = "Patient/"
         let referenceValue = UserDefaultsProvider.getValueFromUserDefaults(key: "patientReference")

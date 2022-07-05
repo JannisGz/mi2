@@ -1,0 +1,5 @@
+# MAC, IDEs
+
+.DS_STORE
+.idea
+*venv*

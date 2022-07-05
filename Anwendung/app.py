@@ -3,11 +3,53 @@ from fhirclient.client import FHIRClient
 
 app = Flask(__name__)
 
+username = "Max Mustermann"
 
-@app.route("/", methods=["GET", "POST"])
+
+@app.route("/test", methods=["GET", "POST"])
 def index():  # put application's code here
     ecgs = get_ecgs()
     return render_template('baseTemplate.html', title="Example", ecgs=ecgs)
+
+
+@app.route("/", methods=["GET", "POST"])
+def login():
+    return render_template('login.html', title="Login")
+
+
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    return render_template('login.html', title="Login")
+
+
+@app.route("/patients", methods=["GET"])
+def get_all_patients():
+    return render_template('patients.html', title="Patienten", username=username)
+
+
+@app.route("/patients/<patient_id>", methods=["GET"])
+def get_patient(patient_id):
+    return render_template('patient.html', title="Patient " + patient_id, username=username)
+
+
+@app.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
+def edit_patient(patient_id):
+    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, username=username)
+
+
+@app.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET", "POST"])
+def patient_ecg(patient_id, ecg_id):
+    return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=username)
+
+
+@app.route("/patients/<patient_id>/help", methods=["GET"])
+def get_help(patient_id):
+    return render_template('help.html', title="Anleitungen", username=username)
+
+
+@app.route("/patients/new", methods=["GET", "POST"])
+def create_patient():
+    return render_template('new_patient.html', title="Neuer Patient")
 
 
 def get_ecgs():

@@ -17,15 +17,28 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb bg-white px-0">
     <li class="breadcrumb-item"><a href="/patients">Patienten</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Neuen Patient anlegen</li>
+    <li class="breadcrumb-item active" aria-current="page">Patient hinzufügen</li>
   </ol>
 </nav>
 
     <form>
+        <!-- Vorname-->
+    <div class="form-outline mb-3">
+        <label class="form-label" for="first_name">Vorname</label>
+        <input type="text" id="first_name" class="form-control" required />
+    </div>
+
+        <!-- Nachname-->
+    <div class="form-outline mb-3">
+        <label class="form-label" for="last_name">Nachname</label>
+        <input type="test" id="last_name" class="form-control" required />
+    </div>
+
+
     <!-- Benutzername-->
     <div class="form-outline mb-3">
         <label class="form-label" for="username">Benutzername</label>
-        <input type="email" id="username" class="form-control" required />
+        <input type="text" id="username" class="form-control" required />
     </div>
 
     <!-- E-Mail -->

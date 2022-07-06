@@ -35,7 +35,8 @@ def get_patient(patient_id):
 
 @app.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
 def edit_patient(patient_id):
-    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, username=username)
+    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, username=username,
+                           patient_id=patient_id)
 
 
 @app.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET", "POST"])

@@ -1,78 +1,50 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, redirect, render_template, jsonify, request, Blueprint
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import create_access_token, JWTManager, jwt_required,get_jwt_identity
 from fhirclient.client import FHIRClient
+from flask_swagger import swagger
+from flask_restx import Api
+import settings
 import smtplib
 import datetime
-app = Flask(__name__)
+from extensions import db, bcrypt, jwt, ma, cors
+
+authorizations = {
+    'Bearer Auth': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    },
+}
+api = Api(version='0.1', title='Backend API', security='Bearer Auth', authorizations=authorizations, description='Backend API for sticker generation')
+
+def configure_app(app):
+    app.secret_key = '123'
+    app.config['SWAGGER_UI_DOC_EXPANSION'] = settings.RESTPLUS_SWAGGER_EXPANSION
+    app.config['RESTX_VALIDATE'] = settings.RESTPLUS_VAL
+    app.config['RESTX_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_TRACK_MODS'] = settings.SQLALCHEMY_TRACK_MODS
+
+def register_extensions(app):
+    db.init_app(app)
+    jwt.init_app(app)
+    bcrypt.init_app(app)
+    ma.init_app(app)
+    cors.init_app(app)
+
+def init_app(app):
+    configure_app(app)
+    api_blueprint = Blueprint('api', __name__, url_prefix='/api')
+    api.init_app(api_blueprint)
+    app.register_blueprint(api_blueprint)
+    register_extensions(app)
+
 
 username = "Max Mustermann"
 
 gmail_user = "pulseappserver@gmail.com"
 gmail_pwd = "qzkigrfvlolpqwuz"
-
-
-@app.route("/test", methods=["GET", "POST"])
-def index():  # put application's code here
-    ecgs = get_ecgs()
-    return render_template('base.html', title="Example", ecgs=ecgs)
-
-
-@app.route("/", methods=["GET", "POST"])
-def login():
-    send_mail()
-    return render_template('login.html', title="Login")
-
-
-@app.route("/logout", methods=["GET", "POST"])
-def logout():
-    return render_template('login.html', title="Login")
-
-
-@app.route("/patients", methods=["GET"])
-def get_all_patients():
-    return render_template('patients.html', title="Patienten", username=username)
-
-
-@app.route("/patients/<patient_id>", methods=["GET"])
-def get_patient(patient_id):
-    return render_template('patient.html', title="Patient " + patient_id, username=username)
-
-
-@app.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
-def edit_patient(patient_id):
-    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, username=username)
-
-
-@app.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET", "POST"])
-def patient_ecg(patient_id, ecg_id):
-    return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=username)
-
-
-@app.route("/patients/<patient_id>/help", methods=["GET"])
-def get_help(patient_id):
-    return render_template('help.html', title="Anleitungen", username=username)
-
-
-@app.route("/patients/new", methods=["GET", "POST"])
-def create_patient():
-    return render_template('new_patient.html', title="Neuer Patient")
-
-
-def get_ecgs():
-    settings = {
-        "app_id": "my_app",
-        "api_base": "http://localhost:8080/fhir/"
-    }
-    client = FHIRClient(settings)
-    result = client.server.request_json(path="Observation")
-    results = []
-    """
-    Result ist wie folgt aufgebaut (JSON):
-    entry (Liste) -> resource -> ? -> Irgendwann kommt das EKG
-    Todo
-    """
-    return result
-
-@app.route("/mail", methods= ["GET"])
 def send_mail():
     address = 'mostermann96@web.de'
     try:
@@ -104,6 +76,19 @@ def send_mail():
         resp  = jsonify(success=True)
         return resp
 
+def create_app():
+    app = Flask(__name__)
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+    configure_app(app)
+    init_app(app)
+
+    @app.route('/')
+    def home():
+        return redirect('/api')
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app = create_app()
+    app.run(debug=True, host= '0.0.0.0')

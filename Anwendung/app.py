@@ -1,9 +1,13 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from fhirclient.client import FHIRClient
-
+import smtplib
+import datetime
 app = Flask(__name__)
 
 username = "Max Mustermann"
+
+gmail_user = "pulseappserver@gmail.com"
+gmail_pwd = "qzkigrfvlolpqwuz"
 
 
 @app.route("/test", methods=["GET", "POST"])
@@ -14,6 +18,7 @@ def index():  # put application's code here
 
 @app.route("/", methods=["GET", "POST"])
 def login():
+    send_mail()
     return render_template('login.html', title="Login")
 
 
@@ -66,6 +71,38 @@ def get_ecgs():
     Todo
     """
     return result
+
+@app.route("/mail", methods= ["GET"])
+def send_mail():
+    address = 'mostermann96@web.de'
+    try:
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_pwd)
+    except Exception as e:
+        print(e)
+
+    subject  =  'Änderung in Ihren Diagnosen vom '+ str(datetime.date.today())
+    body = 'Ihr Arzt hat soeben eine Diagnose zu Ihrem EKG hinzugefuegt. \n' \
+           'Sie koennen diese unter http:0.0.0.0:8080 einsehen'
+    email_text = """\
+    From: %s
+    To: %s
+    Subject: %s
+
+    %s
+    """ % (gmail_user, ", ".join(address), subject, body)
+    email_text = email_text.encode("UTF-8")
+    try:
+        server.sendmail(gmail_user, address, email_text)
+        server.close()
+        print("success")
+        resp = jsonify(success=True)
+        return resp
+    except Exception as e:
+        print(e)
+        resp  = jsonify(success=True)
+        return resp
 
 
 if __name__ == '__main__':

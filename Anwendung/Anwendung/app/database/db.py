@@ -1,4 +1,4 @@
-from extensions import db
+from Anwendung.app.extensions import db
 
 def reset():
     db.drop_all()

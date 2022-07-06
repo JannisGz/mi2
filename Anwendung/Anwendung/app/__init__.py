@@ -1,13 +1,11 @@
 from flask import Flask, redirect, render_template, jsonify, request, Blueprint
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, JWTManager, jwt_required,get_jwt_identity
-from fhirclient.client import FHIRClient
-from flask_swagger import swagger
 from flask_restx import Api
-import settings
+import Anwendung.settings as settings
 import smtplib
 import datetime
-from extensions import db, bcrypt, jwt, ma, cors
+from Anwendung.app.auth.auth import auth_ns
+from Anwendung.app.extensions import db, bcrypt, jwt, ma, cors
+
 
 authorizations = {
     'Bearer Auth': {
@@ -36,6 +34,7 @@ def register_extensions(app):
 def init_app(app):
     configure_app(app)
     api_blueprint = Blueprint('api', __name__, url_prefix='/api')
+    api.add_namespace(auth_ns)
     api.init_app(api_blueprint)
     app.register_blueprint(api_blueprint)
     register_extensions(app)
@@ -78,15 +77,21 @@ def send_mail():
 
 def create_app():
     app = Flask(__name__)
+    import Anwendung.app.database.models
+    import Anwendung.app.database.user
     @app.before_first_request
     def create_tables():
+        db.drop_all()
         db.create_all()
+        db.session.commit()
     configure_app(app)
     init_app(app)
 
     @app.route('/')
     def home():
         return redirect('/api')
+
+    return app
 
 
 if __name__ == '__main__':

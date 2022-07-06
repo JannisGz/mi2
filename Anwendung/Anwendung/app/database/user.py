@@ -1,5 +1,5 @@
 from datetime import datetime
-from extensions import db, bcrypt
+from Anwendung.app.extensions import db, bcrypt
 
 Column = db.Column
 Model = db.Model
@@ -12,6 +12,7 @@ class User(Model):
     __tablename__ = 'user'
     id = Column(db.Integer, primary_key=True)
     email = Column(db.String(64))
+    name = Column(db.String(64))
     username = Column(db.String(15), unique=True, index=True)
     password_hash = Column(db.String(128))
     practise = Column(db.Boolean, default=False)
@@ -39,7 +40,7 @@ class User(Model):
 class Patient(Model):
     __tablename__ = 'patient'
     id = Column(db.Integer, primary_key=True)
-    username = Column(db.Strin(15), db.ForeignKey('user.username'))
+    username = Column(db.String(15), db.ForeignKey('user.username'))
     fhir_id = Column(db.Integer)
     practicioners = Column(db.VARCHAR(255))
     phone = Column(db.VARCHAR(255))
@@ -52,4 +53,4 @@ class Patient(Model):
 class Pratice(Model):
     __tablename__ = 'practise'
     id = Column(db.Integer, primary_key=True)
-    username = Column(db.Strin(15), db.ForeignKey('user.username'))
+    username = Column(db.String(15), db.ForeignKey('user.username'))

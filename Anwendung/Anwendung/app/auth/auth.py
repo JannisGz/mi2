@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
-from auth_logic import validation_error, AuthService
+from .auth_logic import validation_error, AuthService
 
 # Auth modules
 from .dto import AuthDto

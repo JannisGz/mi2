@@ -15,13 +15,6 @@
     <title>{{ title }}</title>
 
     <style>
-        .vertical-center {
-            min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
-            min-height: 100vh; /* These two lines are counted as one :-)       */
-            display: flex;
-            align-items: center;
-            }
-
         @media (min-width: 500px) {
   .container {
     width: 500px;
@@ -39,13 +32,13 @@
     <!-- Benutzername-->
     <div class="form-outline mb-3">
         <label class="form-label" for="username">Benutzername</label>
-        <input type="email" id="username" class="form-control" />
+        <input type="email" id="username" class="form-control" required />
     </div>
 
     <!-- Passwort -->
     <div class="form-outline mb-4">
         <label class="form-label" for="password">Passwort</label>
-        <input type="password" id="password" class="form-control" />
+        <input type="password" id="password" class="form-control" required />
     </div>
 
   <!-- Submit button -->

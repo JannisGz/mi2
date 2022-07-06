@@ -5,9 +5,57 @@
     {% include "header.html" %}
 
 <div class="container sticky-top">
-    <p>CONTENT PLACEHOLDER</p>
-    <p> {{  title  }}</p>
-</div>
+
+<style>
+    @media (min-width: 500px) {
+  .container {
+    width: 500px;
+  }
+</style>
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb bg-white px-0">
+    <li class="breadcrumb-item"><a href="/patients">Patienten</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Neuen Patient anlegen</li>
+  </ol>
+</nav>
+
+    <form>
+    <!-- Benutzername-->
+    <div class="form-outline mb-3">
+        <label class="form-label" for="username">Benutzername</label>
+        <input type="email" id="username" class="form-control" required />
+    </div>
+
+    <!-- E-Mail -->
+    <div class="form-outline mb-4">
+        <label class="form-label" for="email">E-Mail-Adresse</label>
+        <input type="email" id="email" class="form-control" required />
+    </div>
+
+        <!-- E-Mail wiederholen -->
+    <div class="form-outline mb-4">
+        <label class="form-label" for="email_repeat">E-Mail-Adresse wiederholen</label>
+        <input type="email" id="email_repeat" class="form-control" required />
+    </div>
+
+        <!-- Telefonnummer -->
+        <div class="form-outline mb-4">
+        <label class="form-label" for="phone">Telefonnummer</label>
+        <input type="tel" id="phone" class="form-control" required />
+    </div>
+
+         <!-- Geburtsdatum -->
+        <div class="form-outline mb-4">
+        <label class="form-label" for="birth_date">Geburtsdatum</label>
+            <input class="form-control" type="date" id="birth_date" name="birth_date"
+       value="2022-01-01" required />
+        </div>
+
+  <!-- Submit button -->
+  <button type="button" class="btn btn-success btn-block mb-4">Erstellen</button>
+
 
 {% include "footer.html" %}
 

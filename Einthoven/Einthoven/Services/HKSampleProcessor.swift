@@ -113,18 +113,15 @@ class HKSampleProcessor {
                 if (!success) {
                     self.success_client = "failed sending "
                 }
-                count += 1
-                if (self.success_client != "failed sending "){
-                    if (count == resources.count){
-                        self.success_client = "successfully sent "
-                    }
+                if ((self.success_client == "") && (count == resources.count)){
+                    self.success_client = "successfully sent "
                 }
             }
         }
     }
     
     private func FetchSuccess() -> String{
-        if (self.success_client == ""){
+        while (self.success_client == ""){
             let deadline = Date().advanced(by: 0.1)
             Thread.sleep(until: deadline)
         }

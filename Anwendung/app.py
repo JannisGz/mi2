@@ -45,7 +45,7 @@ def patient_ecg(patient_id, ecg_id):
 
 @app.route("/patients/<patient_id>/help", methods=["GET"])
 def get_help(patient_id):
-    return render_template('help.html', title="Anleitungen", username=username)
+    return render_template('help.html', title="Anleitungen", username=username, patient_id=patient_id)
 
 
 @app.route("/patients/new", methods=["GET", "POST"])

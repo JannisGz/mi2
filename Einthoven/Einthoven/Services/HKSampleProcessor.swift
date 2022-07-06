@@ -65,7 +65,6 @@ class HKSampleProcessor {
             }
         }
         
-        var success_send = String ()
         self.processingDispatchGroup.notify(queue: .main) {
             if (self.resources.count > 0) {
                 self.SendResources(resources: self.resources)
@@ -113,6 +112,7 @@ class HKSampleProcessor {
                 if (!success) {
                     self.success_client = "failed sending "
                 }
+                count += 1
                 if ((self.success_client == "") && (count == resources.count)){
                     self.success_client = "successfully sent "
                 }

@@ -38,9 +38,6 @@ class HKSampleQuery {
                                             guard let samples = samplesOrNil, let deletedObjects = deletedObjectsOrNil else {
                                                 fatalError("*** An error occurred during the initial query: \(errorOrNil!.localizedDescription) ***")
                                             }
-                                            
-                                            // Save new anchor
-                                            HKAnchorProvider.SaveAnchor(forType: self.sampleType, anchor: newAnchor!)
             
                                             for deletedObject in deletedObjects {
                                                 print("deleted: \(deletedObject)")
@@ -50,6 +47,10 @@ class HKSampleQuery {
                                             if (samples.count > 0) {
                                                 print("Found " + String(samples.count) + " matching samples.")
                                                 self.resultProcessor.ProcessResults(samples: samples) { success in
+                                                    if (success.1.contains("success")) {
+                                                        // Save new anchor
+                                                        HKAnchorProvider.SaveAnchor(forType: self.sampleType, anchor: newAnchor!)
+                                                    }
                                                     print("HKSampleQuery - All results have been successfully processed")
                                                     closure((true, String(success.1)));
                                                 }

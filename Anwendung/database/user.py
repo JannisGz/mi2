@@ -9,7 +9,7 @@ relationship = db.relationship
 
 class User(Model):
     """ User model for storing user related data """
-
+    __tablename__ = 'user'
     id = Column(db.Integer, primary_key=True)
     email = Column(db.String(64))
     username = Column(db.String(15), unique=True, index=True)
@@ -37,8 +37,19 @@ class User(Model):
         return f"<User {self.username}>"
 
 class Patient(Model):
-
+    __tablename__ = 'patient'
     id = Column(db.Integer, primary_key=True)
-    username = Column(db.String(15), unique=True )
+    username = Column(db.Strin(15), db.ForeignKey('user.username'))
+    fhir_id = Column(db.Integer)
+    practicioners = Column(db.VARCHAR(255))
+    phone = Column(db.VARCHAR(255))
+    weight = Column(db.Integer, nullable=True)
+    size = Column(db.Integer, nullable=True)
+    dob= Column(db.DateTime, nullable=True)
+    lastname = Column(db.String(30))
+    firstname = Column(db.String(30))
 
-    practicioners= Column(db.Integer)
+class Pratice(Model):
+    __tablename__ = 'practise'
+    id = Column(db.Integer, primary_key=True)
+    username = Column(db.Strin(15), db.ForeignKey('user.username'))

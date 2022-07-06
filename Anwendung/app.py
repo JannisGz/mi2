@@ -41,7 +41,8 @@ def edit_patient(patient_id):
 
 @app.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET", "POST"])
 def patient_ecg(patient_id, ecg_id):
-    return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=username)
+    return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=username,
+                           patient_id=patient_id, ecg_id=ecg_id,patient_name="Wolf, Dieter", birth_date="01.03.1947", ecg_datetime="01.07.2022")
 
 
 @app.route("/patients/<patient_id>/help", methods=["GET"])
@@ -51,7 +52,7 @@ def get_help(patient_id):
 
 @app.route("/patients/new", methods=["GET", "POST"])
 def create_patient():
-    return render_template('new_patient.html', title="Neuer Patient")
+    return render_template('new_patient.html', title="Neuer Patient", username=username)
 
 
 def get_ecgs():

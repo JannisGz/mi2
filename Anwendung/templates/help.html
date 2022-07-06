@@ -4,25 +4,26 @@
 
     {% include "header.html" %}
 
-<div class="container sticky-top">
+    <div class="container sticky-top">
 
-<!-- Breadcrumbs -->
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb bg-white px-0">
-    <li class="breadcrumb-item"><a href="/patients">Patienten</a></li>
-      <li class="breadcrumb-item"><a href="/patients/{{ patient_id }}">Patient {{ patient_id }}</a></li>
-      <li class="breadcrumb-item">Anleitungen</li>
-  </ol>
-</nav>
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-white px-0">
+                <li class="breadcrumb-item"><a href="/patients">Patienten</a></li>
+                <li class="breadcrumb-item"><a href="/patients/{{ patient_id }}">Patient {{ patient_id }}</a></li>
+                <li class="breadcrumb-item">Anleitungen</li>
+            </ol>
+        </nav>
 
-    <div class="card mx-auto mb-3"  id="anleitung_card" style="width: 100%; max-width: 500px;">
-  <img class="card-img-top" src="{{  url_for('static', filename='img/Einthoven.png') }}" alt="Einthoven Screen">
-  <div class="card-body">
-    <h5 class="card-title">Freigeben von EKGs</h5>
-    <p class="card-text">Wie man die Einthoven-App verwendet. Verweis auf Serveradresse und Benutzer-Id</p>
-  </div>
-</div>
+        <div class="card mx-auto mb-3" id="anleitung_card" style="width: 100%; max-width: 500px;">
+            <img class="card-img-top" src="{{ url_for('static', filename='img/Einthoven.png') }}"
+                 alt="Einthoven Screen">
+            <div class="card-body">
+                <h5 class="card-title">Freigeben von EKGs</h5>
+                <p class="card-text">Wie man die Einthoven-App verwendet. Verweis auf Serveradresse und Benutzer-Id</p>
+            </div>
+        </div>
 
-{% include "footer.html" %}
+        {% include "footer.html" %}
 
 {% endblock %}

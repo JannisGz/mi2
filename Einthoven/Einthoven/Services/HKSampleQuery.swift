@@ -25,7 +25,7 @@ class HKSampleQuery {
         self.limit = limit
     }
     
-    func QueryAndProcess(closure: @escaping (_ synched: Bool) -> Void) {
+    func QueryAndProcess(closure: @escaping ((Bool, String)) -> Void) {
         let healthStore = HKHealthStore()
 
         // Create the query.
@@ -49,13 +49,13 @@ class HKSampleQuery {
                                             // Process results
                                             if (samples.count > 0) {
                                                 print("Found " + String(samples.count) + " matching samples.")
-                                                self.resultProcessor.ProcessResults(samples: samples) {( success: Bool) in
+                                                self.resultProcessor.ProcessResults(samples: samples) { success in
                                                     print("HKSampleQuery - All results have been successfully processed")
-                                                    closure(true);
+                                                    closure((true, String(success.1)));
                                                 }
                                             } else {
                                                 print("No new matching samples \(self.sampleType.identifier) found")
-                                                closure(false);
+                                                closure((false, "no"));
                                             }
         }
         healthStore.execute(query)

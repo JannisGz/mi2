@@ -15,6 +15,7 @@ class HKSampleProcessor {
     var processingDispatchGroup: DispatchGroup
     var resources: [Resource]
     private let accessQueue = DispatchQueue(label: "SynchronizedArrayAccess", attributes: .concurrent)
+    var success_client = ""
     
     init(client: FhirClient) {
         self.client = client
@@ -23,7 +24,7 @@ class HKSampleProcessor {
         self.resources = [Resource]()
     }
     
-    func ProcessResults(samples: [HKSample], closure: @escaping (_ result: Bool) -> Void) {
+    func ProcessResults(samples: [HKSample], closure: @escaping ((Bool, String)) -> Void) {
         print("Create batch bundle(s) with observations")
         
         for sample in samples {
@@ -64,13 +65,14 @@ class HKSampleProcessor {
             }
         }
         
+        var success_send = String ()
         self.processingDispatchGroup.notify(queue: .main) {
             if (self.resources.count > 0) {
                 self.SendResources(resources: self.resources)
             }
             self.dispatchGroup.notify(queue: .main) {
                 print("HKSampleProcessor - All results have been processed")
-                closure(false)
+                closure((false, self.FetchSuccess() + String(self.resources.count)))
             }
         }
     }
@@ -102,22 +104,34 @@ class HKSampleProcessor {
         return observation
     }
     
-    private func SendResources(resources: [Resource]) {
+    private func SendResources(resources: [Resource]){
         print("HKSampleProcessor - Attempting to transmit bundle with \(resources.count) entries")
         
+        var count = 0
         for r in resources {
             client.send(resource: r){( success: Bool) in
-                print(r.id)
+                if (!success) {
+                    self.success_client = "failed sending "
+                }
+                count += 1
+                if (self.success_client != "failed sending "){
+                    if (count == resources.count){
+                        self.success_client = "successfully sent "
+                    }
+                }
             }
         }
-        
-        
-        //let bundle = TransactionBundle(resources: resources).bundle
-        //print(bundle.entry)
-        
-        //dispatchGroup.enter()
-        //client.send(resource: bundle) {( success: Bool) in
-        //    self.dispatchGroup.leave()
-        //}
     }
+    
+    private func FetchSuccess() -> String{
+        if (self.success_client == ""){
+            let deadline = Date().advanced(by: 0.1)
+            Thread.sleep(until: deadline)
+        }
+        
+        var ret = self.success_client
+        self.success_client = ""
+        return ret
+    }
+    
 }

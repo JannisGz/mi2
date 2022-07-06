@@ -14,7 +14,7 @@ class HKSynchronizer {
                      predicate: NSPredicate?,
                      anchor: HKQueryAnchor,
                      limit: Int,
-                     completionHandler: @escaping (Bool) -> Void) {
+                     completionHandler: @escaping ((Bool, String)) -> Void) {
         let client = GetFhirClient()
         let processor = HKSampleProcessor(client: client)
         let query = HKSampleQuery(resultProcessor: processor,
@@ -24,7 +24,7 @@ class HKSynchronizer {
                                   limit: limit)
         query.QueryAndProcess{ (synchronized) -> Void in
             print("Synchronization for type \(type.identifier) has finished")
-            completionHandler(true)
+            completionHandler((true, synchronized.1))
         }
     }
     

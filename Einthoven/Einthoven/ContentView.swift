@@ -12,8 +12,12 @@ struct ContentView: View {
     
     @State var serverAddress: String = UserDefaultsProvider.getValueFromUserDefaults(key: "serverAddress") ?? ""
     @State var patientReference: String = UserDefaultsProvider.getValueFromUserDefaults(key: "patientReference") ?? ""
+    @State private var color_ECG = Color.red
+    @State private var color_height = Color.red
+    @State private var color_weight = Color.red
     @State var text_ECG = " "
-    @State var text_patientData = " "
+    @State var text_height = " "
+    @State var text_weight = " "
     
     var body: some View {
         ScrollView(Axis.Set.vertical, showsIndicators: true) {
@@ -45,8 +49,20 @@ struct ContentView: View {
                     //let anchor = HKQueryAnchor.init(fromValue: 0)
                    
                     HKSynchronizer().Synchronize(type: ecgType, predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit) { (success) in
-                        if (success) {
-                            text_ECG = "Text ECG"
+                        if (success.0) {
+                            text_ECG = success.1 + " ECG observation"
+                            if (!success.1.contains("1")) {
+                                text_ECG.append("s")
+                            }
+                            if (success.1.contains("failed")){
+                                color_ECG = Color.red
+                            }
+                            else if (success.1.contains("successfully")){
+                                color_ECG = Color.green
+                            }
+                            else {
+                                color_ECG = Color.black
+                            }
                             print("All records synchronized")
                         } else {
                             print("There was an error during synchronization")
@@ -61,10 +77,10 @@ struct ContentView: View {
             .background(Color.accentColor)
             .cornerRadius(8)
             
+            VStack{
+                Text(text_ECG).foregroundColor(color_ECG)
+            }
             Spacer(minLength: 10)
-            Text(text_ECG)
-            
-            Spacer(minLength: 20)
             
             Button(action: {
                 UserDefaultsProvider.setValueInUserDefaults(key: "serverAddress", value: self.serverAddress)
@@ -72,9 +88,21 @@ struct ContentView: View {
                 HKAuthorizer.authorizeHealthKit(completion: { (success, error) in
                     let weightType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bodyMass)!
                     let weightAnchor = HKAnchorProvider.GetAnchor(forType: weightType)
-                    HKSynchronizer().Synchronize(type: weightType, predicate: nil, anchor: weightAnchor, limit: HKObjectQueryNoLimit) { (success) in
-                        if (success) {
-                            text_patientData = "Text Weight"
+                    HKSynchronizer().Synchronize(type: weightType, predicate: nil, anchor: weightAnchor, limit: HKObjectQueryNoLimit) { success in
+                        if (success.0) {
+                            text_weight = success.1 + " weight observation"
+                            if (!success.1.contains("1")) {
+                                text_weight.append("s")
+                            }
+                            if (success.1.contains("failed")){
+                                color_weight = Color.red
+                            }
+                            else if (success.1.contains("successfully")){
+                                color_weight = Color.green
+                            }
+                            else {
+                                color_weight = Color.black
+                            }
                             print("All records synchronized")
                         } else {
                             print("There was an error during synchronization")
@@ -84,8 +112,20 @@ struct ContentView: View {
                     let heightType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.height)!
                     let heightAnchor = HKAnchorProvider.GetAnchor(forType: heightType)
                     HKSynchronizer().Synchronize(type: heightType, predicate: nil, anchor: heightAnchor, limit: HKObjectQueryNoLimit) { (success) in
-                        if (success) {
-                            text_patientData += "\nText Height"
+                        if (success.0) {
+                            text_height = success.1 + " height observation"
+                            if (!success.1.contains("1")) {
+                                text_height.append("s")
+                            }
+                            if (success.1.contains("failed")){
+                                color_height = Color.red
+                            }
+                            else if (success.1.contains("successfully")){
+                                color_height = Color.green
+                            }
+                            else {
+                                color_height = Color.black
+                            }
                             print("All records synchronized")
                         } else {
                             print("There was an error during synchronization")
@@ -109,8 +149,11 @@ struct ContentView: View {
             .background(Color.accentColor)
             .cornerRadius(8)
             
-            Spacer(minLength: 10)
-            Text(text_patientData)
+            VStack{
+                Spacer(minLength: 10)
+                Text(text_weight).foregroundColor(color_weight)
+                Text(text_height).foregroundColor(color_height)
+            }
         }
     }
 }

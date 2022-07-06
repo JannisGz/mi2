@@ -10,7 +10,7 @@ class LoginSchema(Schema):
     - Password (Str)
     """
 
-    email = fields.Email(required=True, validate=[Length(max=64)])
+    username = fields.Str(required=True, validate=[Length(max=64)])
     password = fields.Str(required=True, validate=[Length(min=8, max=128)])
 
 

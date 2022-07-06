@@ -28,12 +28,12 @@ class AuthLogin(Resource):
             200: ("Logged in", auth_success),
             400: "Validations failed.",
             403: "Incorrect password or incomplete credentials.",
-            404: "Email does not match any account.",
+            404: "Username does not match any account.",
         },
     )
     @auth_ns.expect(auth_login, validate=True)
     def post(self):
-        """ Login using email and password """
+        """ Login using username and password """
         # Grab the json data
         login_data = request.get_json()
 

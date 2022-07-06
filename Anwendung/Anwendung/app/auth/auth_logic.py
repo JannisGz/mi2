@@ -8,6 +8,8 @@ user_schema = UserSchema()
 
 def message(status, message):
     response_object ={"status":status, "message":message}
+    return response_object
+
 
 def validation_error(status, errors):
     response_object = {"status": status, "errors": errors}
@@ -30,12 +32,12 @@ class AuthService:
     @staticmethod
     def login(data):
         # Assign vars
-        email = data["email"]
+        username = data["username"]
         password = data["password"]
 
         try:
             # Fetch user data
-            if not (user := User.query.filter_by(email=email).first()):
+            if not (user := User.query.filter_by(username=username).first()):
                 return err_resp(
                     "The email you have entered does not match any account.",
                     "email_404",

@@ -18,7 +18,7 @@ class AuthDto:
     auth_login = auth_ns.model(
         "Login data",
         {
-            "email": fields.String(required=True),
+            "username": fields.String(required=True),
             "password": fields.String(required=True),
         },
     )

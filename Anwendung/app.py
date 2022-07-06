@@ -9,7 +9,7 @@ username = "Max Mustermann"
 @app.route("/test", methods=["GET", "POST"])
 def index():  # put application's code here
     ecgs = get_ecgs()
-    return render_template('baseTemplate.html', title="Example", ecgs=ecgs)
+    return render_template('base.html', title="Example", ecgs=ecgs)
 
 
 @app.route("/", methods=["GET", "POST"])

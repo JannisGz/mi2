@@ -1,19 +1,22 @@
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <!-- Container wrapper -->
+  <div class="container-fluid">
 
-  <a class="navbar-brand" href="#">Home</a>
+    <!-- Navbar brand -->
+    <!--<a class="navvbar-text" href="#"><i class="fa fa-home"> Home</i></a>-->
 
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+      <a class="navbar-brand" href="#">
+    <img src="{{  url_for('static', filename='img/logo.png') }}" alt="Logo" style="width:40px;">
+  </a>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item mx-auto">
-        <p class="nav-link">{{ username }} <span class="sr-only">(current)</span></p>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link mr-0" href="#">Abmelden</a>
-      </li>
-    </ul>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center">
+          <span class="navbar-text">{{ username }}</span>
+      </ul>
+
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <a class="navbar-text" href="/logout">Abmelden <i class="fa fa-sign-out"></i></a>
+      </ul>
+
   </div>
 </nav>

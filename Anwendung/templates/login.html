@@ -28,11 +28,11 @@
 
     <img src="{{ url_for('static', filename='img/logo.png') }}" class="rounded mx-auto d-block my-5" alt="Pulse Logo">
 
-    <form>
+    <form action="/patients">
     <!-- Benutzername-->
     <div class="form-outline mb-3">
         <label class="form-label" for="username">Benutzername</label>
-        <input type="email" id="username" class="form-control" required />
+        <input type="text" id="username" class="form-control" required />
     </div>
 
     <!-- Passwort -->
@@ -42,7 +42,7 @@
     </div>
 
   <!-- Submit button -->
-  <button type="button" class="btn btn-success btn-block mb-4">Anmelden</button>
+    <input type="submit" class="btn btn-success btn-block mb-4" value="Anmelden" />
 
 <div class="row mb-4">
 

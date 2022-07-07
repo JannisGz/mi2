@@ -1,7 +1,11 @@
 from flask import Blueprint, Flask, render_template, flash, url_for, redirect, request
 from flask_login import login_required, current_user
+from .extensions import db
+from .models import User as dbUser
+from .models import Clearance
+from sqlalchemy import text
 
-from Anwendung.fhir_interface import FHIRInterface
+from .fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
 
@@ -11,9 +15,27 @@ fhir_interface = FHIRInterface(fhir_url)
 username = "Max Mustermann"
 
 
+def getPatientsByClearance(practisename):
+    patients = list()
+    query = Clearance.query.filter_by(practisename=practisename) \
+                .join(dbUser, dbUser.username == Clearance.practisename)
+    for row in query:
+        patients.append(row.fhri_id)
+    return patients
+
+def getPractisesByClearance(username):
+    practises = list()
+    query = Clearance.query.filter_by(username=username) \
+        .join(dbUser, dbUser.username == Clearance.practisename)
+    for row in query:
+        practise = dbUser.query.filter_by(username=row.practisename).one()
+        practises.append((practise.name, practise.id))
+    return practises
+
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
+
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         # TODO fetch all patients with permission
@@ -26,6 +48,7 @@ def patients():
     else:
         return redirect(url_for('main.patient', title="Patient" + str(current_user.fhir_id), username=current_user.name,
                                 patient_id=current_user.fhir_id))
+
 
 
 @main.route("/patients/<patient_id>", methods=["GET"])

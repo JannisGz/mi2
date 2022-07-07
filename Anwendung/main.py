@@ -154,6 +154,8 @@ def patient_update_post(patient_id):
         fhir_interface.update_patient(patient_id, firstname, lastname)
         # Passwort und E-Mail in eigener DB aktualisieren
         user.email = email
+        user.telephone = phone
+        user.name = firstname + " " + lastname
         if password:
             user.password = generate_password_hash(password, method='sha256')
 
@@ -242,7 +244,7 @@ def patient_new_post():
 
             password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
             new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
-                              password=generate_password_hash(password, method='sha256'))
+                              password=generate_password_hash(password, method='sha256'), telephone=phone)
 
             db.session.add(new_User)
             db.session.commit()

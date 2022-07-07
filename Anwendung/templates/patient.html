@@ -24,11 +24,11 @@
                 <p class="card-text"><b>Benutzername: </b>{{user.username}}</p>
                 {% endif %}
                 <p class="card-text"><b>E-Mail: </b> {{user.email}} </p>
-                <p class="card-text"><b>Telefonnummer: </b>0123 456 789</p>
+                <p class="card-text"><b>Telefonnummer: </b>{{user.telephone}}</p>
                 {% if user.practise == 0 %}
                 <p class="card-text"><b>Freigegeben für: </b>Praxis Dr. med. Jürgen Fischer</p>
-                <a href="/patients/{{ patient.id }}/edit" class="btn btn-secondary">Bearbeiten <i
-                        class="fa fa-edit"></i></a>
+                <a href="/patients/{{ patient.id }}/edit" class="btn btn-secondary">Bearbeiten
+                    <i class="fa fa-edit"></i></a>
                 {% endif %}
             </div>
         </div>

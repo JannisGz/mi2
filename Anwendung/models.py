@@ -19,8 +19,7 @@ class User(UserMixin, Model):
     password = Column(db.String(128))
     practise = Column(db.Boolean, default=False)
     fhir_id = Column(db.String(128), nullable=True)
-
-
+    telephone = Column(db.String(15), nullable=True)
 
 class Clearance(Model):
     __tablename__ = 'clearances'

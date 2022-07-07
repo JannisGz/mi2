@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <!-- Scaling for phone screens -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Todo -->
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/base.css') }}">
-    <!-- Todo -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
     <!-- Bootstrap -->
@@ -29,17 +27,25 @@
 
     <img src="{{ url_for('static', filename='img/logo.png') }}" class="rounded mx-auto d-block my-5" alt="Pulse Logo">
 
-    <form action="/patients">
+    {% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="notification is-danger">
+        {{ messages[0] }}
+    </div>
+{% endif %}
+{% endwith %}
+
+    <form method="POST" action="/">
         <!-- Benutzername-->
         <div class="form-outline mb-3">
             <label class="form-label" for="username">Benutzername</label>
-            <input type="text" id="username" class="form-control" required/>
+            <input type="text" id="username" name="username" class="form-control" required/>
         </div>
 
         <!-- Passwort -->
         <div class="form-outline mb-4">
             <label class="form-label" for="password">Passwort</label>
-            <input type="password" id="password" class="form-control" required/>
+            <input type="password" id="password" name="password" class="form-control" required/>
         </div>
 
         <!-- Submit button -->

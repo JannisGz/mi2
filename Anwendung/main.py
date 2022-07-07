@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
 from .mail import Mail
 from .fhir_interface import FHIRInterface
+import multiprocessing as mp
 
 main = Blueprint('main', __name__)
 
@@ -116,8 +117,10 @@ def patients():
     if current_user.practise:
         patient_ids = getPatientsByClearance(current_user.name)
 
-        patients = [(fhir_interface.get_patient(str(id)), len(fhir_interface.get_ecgs_new(str(id))),
-                     fhir_interface.get_ecg_newest_date(str(id))) for id in patient_ids]
+        while None in patient_ids:
+            patient_ids.remove(None)
+        patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
+                     fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
 
         return render_template('patients.html', title="Patienten", user=current_user, patients=patients)
     # Patienten werden auf ihre Patientenseite umgeleitet
@@ -192,6 +195,8 @@ def patient_update_post(patient_id):
         fhir_interface.update_patient(patient_id, firstname, lastname)
         # Passwort und E-Mail in eigener DB aktualisieren
         user.email = email
+        user.telephone = phone
+        user.name = firstname + " " + lastname
         if password:
             user.password = generate_password_hash(password, method='sha256')
 
@@ -289,18 +294,18 @@ def patient_new_post():
                 flash('Der Nutzername existiert bereits.', 'error')
                 return redirect(url_for('main.patient_new'))
 
-            fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female")
+            fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female", username)
             print(fhir_id)
 
-            password = lastname + ''.join(random.choice(string.ascii_letters) for i in range(4))
-            new_User = dbUser(email=email, name=firstname + " " + lastname, username=username, practise=False,
-                              fhir_id=fhir_id, \
-                              password=generate_password_hash(password, method='sha256'))
+            password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
+            new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
+                              password=generate_password_hash(password, method='sha256'), telephone=phone)
 
             db.session.add(new_User)
             add_clearance(username, current_user.name)
             db.session.commit()
-            Mail.send_mail_created(email, username, password)
+            proc = mp.Process(target = Mail.send_mail_created, args = (email, username, password))
+            proc.start()
             flash('Patient erfolgreich hinzugefügt', "success")
             return redirect(url_for('main.patients', title="Patient " + fhir_id, username=current_user.name,
                                     patient_id=fhir_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))

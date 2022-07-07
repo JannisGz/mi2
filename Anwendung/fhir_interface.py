@@ -94,12 +94,12 @@ class FHIRInterface:
         observation = self.client.reference('Observation', observation_id).to_resource()
         return Observation.parse_obj(observation)
 
-    def get_id(self, name_first: str, name_family: str, rand_identifier: str):
+    def get_id(self, name_first: str, name_family: str, identifier: str):
         '''
         helper function for create_patient
         :param name_first:
         :param name_family:
-        :param rand_identifier: created with patient in create_patient
+        :param identifier: created with patient in create_patient
         :return: patient id
         '''
         ret = 0
@@ -108,13 +108,13 @@ class FHIRInterface:
             time.sleep(0.5)
             patients = self.patients_resources.search(family=name_family, given=name_first).fetch_all()
             for patient in patients:
-                if patient.identifier[0].id == rand_identifier:
+                if patient.identifier[0].id == identifier:
                     return patient.id
             c += 1
-            if c == 600:
+            if c == 1200:
                 return 0
 
-    def create_patient(self, name_first: str, name_family: str, dob: str, gender: str):
+    def create_patient(self, name_first: str, name_family: str, dob: str, gender: str, identifier: str):
         '''
         :param name_first: String
         :param name_family: String
@@ -124,10 +124,9 @@ class FHIRInterface:
         '''
         patient = Patient()
 
-        rand = random.randint(100, 9999999)
-        identifier = Identifier()
-        identifier.id = str(rand)
-        patient.identifier = [identifier]
+        i = Identifier()
+        i.id = identifier
+        patient.identifier = [i]
 
         name = HumanName()
         name.use = "official"
@@ -140,9 +139,7 @@ class FHIRInterface:
 
         self.client.resource('Patient', **json.loads(patient.json())).save()
 
-        time.sleep(3)
-
-        return self.get_id(name_first, name_family, str(rand))
+        return self.get_id(name_first, name_family, identifier)
 
     def update_patient(self, id: str, name_first_new=None, name_family_new=None, dob_new=None, gender_new=None):
         """

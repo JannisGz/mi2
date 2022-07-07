@@ -24,12 +24,15 @@ def getPractisesByClearance(username):
     query = Clearance.query.filter_by(username=username) \
         .join(dbUser, dbUser.username == Clearance.practisename)
     for row in query:
-        practises.append((row.practisename, row.fhir_id))
+        practise = dbUser.query.filter_by(username=row.practisename).one()
+        practises.append((practise.name, practise.id))
     return practises
 
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
+
+
 
    return render_template('patients.html', title="Patienten", username=current_user.name)
 

@@ -64,8 +64,10 @@
         </form>
         {% endif %}
 
+        {% if user.practise == 0 %}
         <p>ICD-10-GM Kodierung: <b>{{ diagnosis }}</b></p>
         <p>Entspricht: - </p>
+        {% endif %}
 
 
     </div>
@@ -110,6 +112,7 @@
                 ctx.lineTo(period*i*15360/30, height);
                 ctx.closePath();
                 ctx.stroke();
+                ctx.strokeText(i + "s", period*i*15360/30 + 5, height*0.95);
             }
 
             for (let i = 1; i < 10; i++) {

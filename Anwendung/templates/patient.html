@@ -14,11 +14,6 @@
 
         <!-- Patienten-Infos -->
         <div><h3>Patient ID {{ patient.id }} | {{ patient.name[0].family }}, {{ patient.name[0].given[0] }} | {{ patient.birthDate }}</h3></div>
-        <p></p>
-
-        <!-- Gewicht, Größe -->
-        <p><b>Letzte Körpergröße: </b>{{height}}</p>
-        <p><b>Letztes Gewicht: </b>{{weight}}</p>
 
         <!-- Administrative Daten -->
         <div class="card">
@@ -26,9 +21,9 @@
                 <h5 class="card-title">Administrative Daten</h5>
                 <hr>
                 {% if user.practise == 0 %}
-                <p class="card-text"><b>Benutzername: </b>klauswolf</p>
+                <p class="card-text"><b>Benutzername: </b>{{user.username}}</p>
                 {% endif %}
-                <p class="card-text"><b>E-Mail: </b>klauswolf@gmail.com</p>
+                <p class="card-text"><b>E-Mail: </b> {{user.email}} </p>
                 <p class="card-text"><b>Telefonnummer: </b>0123 456 789</p>
                 {% if user.practise == 0 %}
                 <p class="card-text"><b>Freigegeben für: </b>Praxis Dr. med. Jürgen Fischer</p>
@@ -37,6 +32,10 @@
                 {% endif %}
             </div>
         </div>
+        <p></p>
+        <!-- Gewicht, Größe -->
+        <p><b>Letzte Körpergröße: </b>{{height}}</p>
+        <p><b>Letztes Gewicht: </b>{{weight}}</p>
 
         <!-- EKG-Tabelle -->
         <div class="container mx-0 px-0 my-5">

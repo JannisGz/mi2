@@ -35,7 +35,7 @@ def getPractisesByClearance(username):
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
-
+    print("HIer")
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         # TODO fetch all patients with permission

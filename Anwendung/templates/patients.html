@@ -35,11 +35,11 @@
                 <tbody>
                 {% for patient in patients %}
                 <tr>
-                    <td><a href="/patients/{{ patient.id }}" class="text-dark">{{ patient[0].id }}</a></td>
-                    <td><a href="/patients/{{ patient.id }}" class="text-dark"> {{ patient[0].name[0].family }} </a></td>
-                    <td><a href="/patients/{{ patient.id }}" class="text-dark"> {{ patient[0].name[0].given[0] }}</a></td>
-                    <td><a href="/patients/{{ patient.id }}" class="text-dark">{{ patient[1] }}</a></td>
-                    <td><a href="/patients/{{ patient.id }}" class="text-dark">{{ patient[2] }}</a></td>
+                    <td><a href="/patients/{{ patient[0].id }}" class="text-dark">{{ patient[0].id }}</a></td>
+                    <td><a href="/patients/{{ patient[0].id }}" class="text-dark"> {{ patient[0].name[0].family }} </a></td>
+                    <td><a href="/patients/{{ patient[0].id }}" class="text-dark"> {{ patient[0].name[0].given[0] }}</a></td>
+                    <td><a href="/patients/{{ patient[0].id }}" class="text-dark">{{ patient[1] }}</a></td>
+                    <td><a href="/patients/{{ patient[0].id }}" class="text-dark">{{ patient[2] }}</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>

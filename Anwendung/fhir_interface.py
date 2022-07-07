@@ -189,6 +189,23 @@ class FHIRInterface:
             ecg_diagnosis.append((ecg, self.get_diagnosis(ecg.id)))
         return ecg_diagnosis
 
+    def get_ecgs_new(self, patient_id):
+        ecgs = self.get_ecgs(patient_id)
+        ecgs_new = []
+        for ecg in ecgs:
+            try:
+                ecg.note[0].text
+            except:
+                ecgs_new.append(ecg)
+        return ecgs_new
+
+    def get_ecg_newest_date(self, patient_id):
+        try:
+            ecg = self.get_ecgs(patient_id).pop()
+            return (ecg.meta.lastUpdated.strftime("%Y-%m-%d %H:%M:%S"))
+        except:
+            return "-"
+
 '''
 interface = FHIRInterface('http://localhost:8080/fhir')
 print(interface.create_patient("First", "Last", "2020-01-01", "male"))

@@ -17,8 +17,9 @@ def patients():
 
     # TODO fetch all patients with permission
     patient_ids = ["60", "61"]
-    patients = [fhir_interface.get_patient(id) for id in patient_ids]
-    print(patients)
+    patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
+                 fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
+    #print(patients)
 
 
     return render_template('patients.html', title="Patienten", username=current_user.name, patients=patients)

@@ -64,8 +64,10 @@
         </form>
         {% endif %}
 
+        {% if user.practise == 0 %}
         <p>ICD-10-GM Kodierung: <b>{{ diagnosis }}</b></p>
         <p>Entspricht: - </p>
+        {% endif %}
 
 
     </div>

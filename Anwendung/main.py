@@ -147,7 +147,7 @@ def patient_new_post():
         patient_id = "12345"
         # Todo: Als FHIR-Ressource hinzufügen, FHIR_ID zu Datenbank hinzufügen
 
-        password = lastname.join(random.choice(string.ascii_letters) for i in range(4))
+        password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
         new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
                           password=generate_password_hash(password, method='sha256'))
         Mail.send_mail_created(email, username, password)

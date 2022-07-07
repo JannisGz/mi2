@@ -14,13 +14,8 @@
         </nav>
 
         <!-- Patienten-Infos -->
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb bg-white px-0">
-                <li class="breadcrumb-item">Patient {{ patient.id }}</li>
-                <li class="breadcrumb-item">{{ patient.name[0].family }}, {{ patient.name[0].given[0] }}</li>
-                <li class="breadcrumb-item">{{ patient.birthDate }}</li>
-            </ol>
-        </nav>
+        <div><h3>Patient ID {{ patient.id }} | {{ patient.name[0].family }}, {{ patient.name[0].given[0] }} | {{ patient.birthDate }}</h3></div>
+        <p></p>
 
         <!-- Gewicht, Größe -->
         <p><b>Letzte Körpergröße: </b>{{height}}</p>

@@ -1,8 +1,7 @@
-from flask import Blueprint, Flask, render_template, flash
+from flask import Blueprint, Flask, render_template, flash, url_for, redirect
 from flask_login import login_required, current_user
 
 main = Blueprint('main', __name__)
-
 
 username = "Max Mustermann"
 
@@ -10,13 +9,20 @@ username = "Max Mustermann"
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
-    return render_template('patients.html', title="Patienten", username=current_user.name)
+    # Nur Ärzte haben hier Zugriff
+    if current_user.practise:
+        return render_template('patients.html', title="Patienten", username=current_user.name)
+    # Patienten werden auf ihre Patientenseite umgeleitet
+    else:
+        return redirect(url_for('main.patient', title="Patient" + str(current_user.fhir_id), username=current_user.name,
+                                patient_id=current_user.fhir_id))
 
 
 @main.route("/patients/<patient_id>", methods=["GET"])
 @login_required
 def patient(patient_id):
-    return render_template('patient.html', title="Patient " + patient_id, username=current_user.name, patient_id=patient_id,
+    return render_template('patient.html', title="Patient " + patient_id, username=current_user.name,
+                           patient_id=patient_id,
                            patient_name="Wolf, Dieter", birth_date="01.03.1947")
 
 
@@ -31,7 +37,8 @@ def patient_update(patient_id):
 @login_required
 def patient_ecg(patient_id, ecg_id):
     return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=current_user.name,
-                           patient_id=patient_id, ecg_id=ecg_id, patient_name="Wolf, Dieter", birth_date="01.03.1947", ecg_datetime="01.07.2022")
+                           patient_id=patient_id, ecg_id=ecg_id, patient_name="Wolf, Dieter", birth_date="01.03.1947",
+                           ecg_datetime="01.07.2022")
 
 
 @main.route("/patients/<patient_id>/help", methods=["GET"])

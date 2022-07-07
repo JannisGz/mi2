@@ -17,6 +17,10 @@ fhir_interface = FHIRInterface(fhir_url)
 username = "Max Mustermann"
 
 def getAllPractises():
+    """
+    Query database for all available practises
+    :return: List of Tuples (string: practisename, int: practiseID)
+    """
     practises = list()
     query = dbUser.query.filter_by(practise=True)
     for practise in query:
@@ -24,15 +28,25 @@ def getAllPractises():
     return practises
 
 def getPatientsByClearance(practisename):
+    """
+    Get patients that made their records available for the currently signed in practise
+    :param practisename: automtically taken from path
+    :return: List of patients' FHIR_IDs
+    """
     patients = list()
     query = Clearance.query.filter_by(practisename=practisename) \
         .join(dbUser, dbUser.username == Clearance.practisename)
     for row in query:
-        patients.append(row.fhri_id)
+        patients.append((dbUser.query.filter_by(username=row.username).first()).fhir_id)
     return patients
 
 
 def getPractisesByClearance(username):
+    """
+    Returns a List of Practises the currently logged in patient has made their records available to
+    :param username:
+    :return: List of tuples (string: practisename, int: practiseID)
+    """
     practises = list()
     query = Clearance.query.filter_by(username=username) \
         .join(dbUser, dbUser.username == Clearance.practisename)
@@ -41,6 +55,22 @@ def getPractisesByClearance(username):
         practises.append((practise.name, practise.id))
     return practises
 
+def setClearance(username, practisename):
+    try:
+        query = Clearance.query.filter_by(username=username,  practisename=practisename).one()
+        db.session.delete(query)
+    except:
+        clr = Clearance(username=username, practisename=practisename)
+        db.session.add(clr)
+    db.session.commit()
+    return
+
+
+@main.route("/testroute", methods=["GET"])
+def testfunc():
+    result = setClearance("Patient1", "Musterpraxis")
+    print(result)
+    return render_template('login.html', title="Login")
 
 @main.route("/patients", methods=["GET"])
 @login_required
@@ -48,7 +78,7 @@ def patients():
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         # TODO fetch all patients with permission
-        patient_ids = ["60", "61"]
+        patient_ids = getPatientsByClearance(current_user.name)
         patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
                      fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
 

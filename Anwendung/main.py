@@ -16,7 +16,12 @@ fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
 
-
+def getAllPractises():
+    practises = list()
+    query = dbUser.query.filter_by(practise=True)
+    for practise in query:
+        practises.append((practise.name, practise.id))
+    return practises
 
 def getPatientsByClearance(practisename):
     patients = list()

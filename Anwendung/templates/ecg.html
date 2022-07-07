@@ -31,7 +31,7 @@
 
         <!-- EKG Visualisierung-->
         <div style="overflow: scroll;" class="container border">
-            <canvas id="myCanvas" width="3100" height="100">
+            <canvas id="myCanvas" width="3100" height="200">
                 Your browser does not support the HTML canvas tag.
             </canvas>
         </div>
@@ -89,21 +89,43 @@
 
             let data = {{ ecg_data }}
 
-            let height = 100;
+            let height = 130;
+            c.height = height
             let y_zero = height / 2.0;
             let x = 0;
-            let period = 1.953125 / 10.0;
+            let period = 1.953125 / 5.0;
             let y = y_zero;
-            let scaling = 50000;
+            let scaling = -100000;
+            c.width = period * 15360 + 10
 
+            for (let i = 1; i < 30; i++) {
+                ctx.strokeStyle = "rgb(205,207,210)";
+                ctx.lineWidth = 1
+                ctx.beginPath();
+                ctx.moveTo(period*i*15360/30, 0);
+                ctx.lineTo(period*i*15360/30, height);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            for (let i = 1; i < 5; i++) {
+                ctx.strokeStyle = "rgb(205,207,210)";
+                ctx.lineWidth = 1
+                ctx.beginPath();
+                ctx.moveTo(0, 0 - 0.0005*i*scaling);
+                ctx.lineTo(period*15360, 0 - 0.0005*i*scaling);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = "rgb(193,23,18)";
+            ctx.lineWidth = 2
             ctx.moveTo(x, y);
-
             for (element of data) {
                 x = x + period;
                 y = y_zero + element * scaling;
                 ctx.lineTo(x, y);
             }
-
             ctx.stroke();
         </script>
 

@@ -40,14 +40,15 @@ def patient_update(patient_id):
 @login_required
 def patient_ecg(patient_id, ecg_id):
     p = fhir_interface.get_patient(patient_id)
-    name = str(p.name[0].family) + ", " + str(p.name[0].given[0])
-    dob = str(p.birthDate)
-
-    ecg = fhir_interface.get_observation(ecg_id)
-    #ecg.
+    e = fhir_interface.get_observation(ecg_id)
+    d = fhir_interface.get_diagnosis(ecg_id)
+    h = fhir_interface.get_height(patient_id)
+    w = fhir_interface.get_weight(patient_id)
+    ecg_data = e.component[0].valueSampledData.data.split(" ")[:-1]
+    ecg_data = [float(x) for x in ecg_data]
 
     return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=current_user.name,
-                           patient_id=patient_id, ecg_id=ecg_id, patient_name=name, birth_date=dob, ecg_datetime="01.07.2022")
+                           ecg=e, patient=p, diagnosis = d, height=h, weight=w, ecg_data=ecg_data)
 
 
 @main.route("/patients/<patient_id>/help", methods=["GET"])

@@ -3,6 +3,10 @@ from flask import Flask, render_template, jsonify
 import smtplib
 import datetime
 
+from email.message import EmailMessage
+from email.headerregistry import Address
+from email.utils import make_msgid
+
 gmail_user = "pulseappserver@gmail.com"
 gmail_pwd = "qzkigrfvlolpqwuz"
 
@@ -10,6 +14,7 @@ class Mail:
 
 
     def send_mail(address):
+        msg = EmailMessage()
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
             server.ehlo()
@@ -20,15 +25,12 @@ class Mail:
         subject  =  'Änderung in Ihren Diagnosen vom '+ str(datetime.date.today())
         body = 'Ihr Arzt hat soeben eine Diagnose zu Ihrem EKG hinzugefuegt. \n' \
                'Sie koennen diese unter http:0.0.0.0:8080 einsehen'
-        email_text = """\
-        From: %s
-        To: %s
-        Subject: %s
-        %s
-        """ % (gmail_user, ", ".join(address), subject, body)
-        email_text = email_text.encode("UTF-8")
+        msg['Subject'] = "Es gibt neue Diagnosen bei Pulse"
+        msg['From'] = gmail_user
+        msg['To'] = address
+        msg.set_content(body)
         try:
-            server.sendmail(gmail_user, address, email_text)
+            server.send_message(msg)
             server.close()
             print("success")
             resp = jsonify(success=True)
@@ -37,6 +39,7 @@ class Mail:
             print(e)
 
     def send_mail_created(address, username, password):
+        msg = EmailMessage()
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
             server.ehlo()
@@ -47,16 +50,13 @@ class Mail:
         subject = "Herzlich willkommnen bei Pulse"
         body = "Ihr Arzt hat soeben einen Nutzeraccount für Pulse angelegt." \
                f"Sie können sich ab sofort mit Ihrem Nutzernamen {username} und " \
-               f"dem sicher generierten Passwort {password} unter 127.0.0.1:5000 einloggen"
-        email_text = """\
-        From: %s
-        To: %s
-        Subject: %s
-        %s
-        """ % (gmail_user, ", ".join(address), subject, body)
-        email_text = email_text.encode("UTF-8")
+               f"dem sicher generierten Passwort \"{password}\" unter 127.0.0.1:5000 einloggen"
+        msg['Subject'] = "Herzlich willkommen bei Pulse"
+        msg['From'] = gmail_user
+        msg['To'] = address
+        msg.set_content(body)
         try:
-            server.sendmail(gmail_user, address, email_text)
+            server.send_message(msg)
             server.close()
             print("success")
             resp = jsonify(success=True)

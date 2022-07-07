@@ -138,9 +138,9 @@ class FHIRInterface:
         patient.birthDate = dob
         patient.gender = gender
 
-        self.client.resource('Patient',**json.loads(patient.json())).save()
+        self.client.resource('Patient', **json.loads(patient.json())).save()
 
-        return self.get_id(name_first, name_family, rand)
+        return self.get_id(name_first, name_family, str(rand))
 
     def update_patient(self, id: str, name_first_new=None, name_family_new=None, dob_new=None, gender_new=None):
         """

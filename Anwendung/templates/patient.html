@@ -26,9 +26,9 @@
                 <h5 class="card-title">Administrative Daten</h5>
                 <hr>
                 {% if user.practise == 0 %}
-                <p class="card-text"><b>Benutzername: </b>klauswolf</p>
+                <p class="card-text"><b>Benutzername: </b>{{user.username}}</p>
                 {% endif %}
-                <p class="card-text"><b>E-Mail: </b>klauswolf@gmail.com</p>
+                <p class="card-text"><b>E-Mail: </b> {{user.email}} </p>
                 <p class="card-text"><b>Telefonnummer: </b>0123 456 789</p>
                 {% if user.practise == 0 %}
                 <p class="card-text"><b>Freigegeben für: </b>Praxis Dr. med. Jürgen Fischer</p>

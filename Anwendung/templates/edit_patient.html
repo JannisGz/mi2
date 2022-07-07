@@ -15,69 +15,70 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-white px-0">
                 <li class="breadcrumb-item"><a href="/patients">Patienten</a></li>
-                <li class="breadcrumb-item"><a href="/patients/{{ patient_id }}">Patient {{ patient_id }}</a></li>
+                <li class="breadcrumb-item"><a href="/patients/{{ patient.id }}">Patient {{ patient.id }}</a></li>
                 <li class="breadcrumb-item">Bearbeiten</li>
             </ol>
         </nav>
 
-        <form action="/patients/{{ patient_id }}">
+        <form method="POST" action="/patients/{{ patient.id }}/edit">
             <!-- Vorname-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="first_name">Vorname</label>
-                <input type="text" id="first_name" class="form-control" required/>
+                <input type="text" id="first_name" name="first_name" class="form-control" value="{{ patient.name[0].given[0] }}" required/>
             </div>
 
             <!-- Nachname-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="last_name">Nachname</label>
-                <input type="test" id="last_name" class="form-control" required/>
+                <input type="test" id="last_name" name="last_name" class="form-control" value="{{ patient.name[0].family }}" required/>
             </div>
 
             <!-- E-Mail -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="email">E-Mail-Adresse</label>
-                <input type="email" id="email" class="form-control" required/>
+                <input type="email" id="email" name="email" class="form-control" value="{{ current_user.email }}" required/>
             </div>
 
             <!-- E-Mail wiederholen -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="email_repeat">E-Mail-Adresse wiederholen</label>
-                <input type="email" id="email_repeat" class="form-control"/>
+                <input type="email" id="email_repeat" name="email_repeat" value="{{ current_user.email }}" class="form-control"/>
             </div>
 
             <!-- Telefonnummer -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="phone">Telefonnummer</label>
-                <input type="tel" id="phone" class="form-control" required/>
+                <input type="tel" id="phone" class="form-control" name="phone" value="{{ patient.phone }}" required/>
             </div>
 
-            <!-- Datenfreigabe-->
+            <!-- Datenfreigabe -->
+            <!-- To do clearances -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="clearance">Daten freigegeben für:</label>
-                <br>
-                <select class="select form-control" multiple id="clearance">
-                    <option value="123" selected>Praxis Dr. med. Jürgen Fischer</option>
-                    <option value="456">Hausärztin Dr. med. Janina Müller</option>
-                    <option value="789">Hausarztpraxis Bert Meier</option>
+                </br>
+                <select name="clearance" class="select form-control" multiple id="clearance">
+                    <option value="1" selected>Praxis Dr. med. Jürgen Fischer</option>
+                    <option value="2">Hausärztin Dr. med. Janina Müller</option>
+                    <option value="3">Hausarztpraxis Bert Meier</option>
                 </select>
             </div>
 
             <!-- Altes Passwort -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="password_old">Passwort</label>
-                <input type="password" id="password_old" class="form-control" required/>
+                <input type="password" id="password_old" name="password_old" class="form-control" required/>
             </div>
 
             <!-- Passwort Neu-->
             <div class="form-outline mb-4">
                 <label class="form-label" for="password">Neues Passwort</label>
-                <input type="password" id="password" class="form-control"/>
+                <input type="password" id="password" name="password" class="form-control"/>
             </div>
 
             <!-- Passwort Neu wiederholen-->
             <div class="form-outline mb-4">
                 <label class="form-label" for="password_repeat">Neues Passwort wiederholen</label>
-                <input type="password" id="password_repeat" class="form-control"/>
+                <input type="password" id="password_repeat" name="password_repeat" class="form-control"/>
             </div>
 
             <input type="submit" class="btn btn-success btn-block mb-4" value="Speichern"/>

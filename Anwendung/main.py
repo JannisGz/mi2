@@ -4,14 +4,14 @@ from .extensions import db
 from .models import User as dbUser
 from .models import Clearance
 import random, string
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
 from .mail import Mail
 from .fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
 
-fhir_url = 'http://localhost:8080/fhir'
+fhir_url = 'http://192.168.85.121:8080/fhir'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
@@ -26,10 +26,11 @@ def getAllPractises():
 def getPatientsByClearance(practisename):
     patients = list()
     query = Clearance.query.filter_by(practisename=practisename) \
-                .join(dbUser, dbUser.username == Clearance.practisename)
+        .join(dbUser, dbUser.username == Clearance.practisename)
     for row in query:
         patients.append(row.fhri_id)
     return patients
+
 
 def getPractisesByClearance(username):
     practises = list()
@@ -39,6 +40,7 @@ def getPractisesByClearance(username):
         practise = dbUser.query.filter_by(username=row.practisename).one()
         practises.append((practise.name, practise.id))
     return practises
+
 
 @main.route("/patients", methods=["GET"])
 @login_required
@@ -57,7 +59,6 @@ def patients():
                                 patient_id=current_user.fhir_id))
 
 
-
 @main.route("/patients/<patient_id>", methods=["GET"])
 @login_required
 def patient(patient_id):
@@ -69,14 +70,64 @@ def patient(patient_id):
     return render_template('patient.html', title="Patient " + patient_id, user=current_user, patient_id=patient_id,
                            patient=p, height=h, weight=w, ecgs=e)
 
-@main.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
+
+@main.route("/patients/<patient_id>/edit", methods=["GET"])
 @login_required
 def patient_update(patient_id):
     # Nur Patienten haben hier Zugriff
     if current_user.practise:
         return redirect(url_for('main.patients'))
-    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, user=current_user,
-                           patient_id=patient_id)
+    p = fhir_interface.get_patient(patient_id)
+    return render_template('edit_patient.html', title="Patient bearbeiten " + patient_id, user=current_user,
+                           patient=p, current_user=current_user)
+
+
+@main.route("/patients/<patient_id>/edit", methods=["POST"])
+@login_required
+def patient_update_post(patient_id):
+    # Get form data
+    patient = fhir_interface.get_patient(patient_id)
+    firstname = request.form.get('first_name')
+    lastname = request.form.get('last_name')
+    email = request.form.get('email')
+    email_repeat = request.form.get('email_repeat')
+    phone = request.form.get('phone')
+    password = request.form.get('password')
+    password_old = request.form.get('password_old')
+    password_repeat = request.form.get('password_repeat')
+    # Todo: Echt Ids zurückgeben. Im Moment Platzhalter
+    clearances = request.form.get('clearance')
+
+    # Validate
+    # Alle Felder müssen gesetzt sein (außer Passwort-Neu und Wiederholen)
+    if not firstname or not lastname or not email or not phone or not password_old or not email_repeat:
+        flash('Alle Felder müssen ausgefüllt sein.', 'error')
+        return redirect(url_for('main.patient_update', patient_id=patient_id))
+    elif email_repeat and email != email_repeat:
+        flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
+        return redirect(url_for('main.patient_update', patient_id=patient_id))
+    elif (password or password_repeat) and password != password_repeat:
+        flash('Die gesetzten Passwörter müssen identisch sein.', 'error')
+        return redirect(url_for('main.patient_update', patient_id=patient_id))
+    else:
+        # Altes Passwort (password_old) überprüfen
+        user = dbUser.query.filter_by(username=current_user.name).first()
+
+        if not user or not check_password_hash(user.password, password_old):
+            flash('Ungültige Zugangsdaten.', 'error')
+            return redirect(url_for('main.patient_update', patient_id=patient_id))
+
+        # FHIR Patient aktualisieren
+        fhir_interface.update_patient(patient_id, firstname, lastname)
+        # Passwort und E-Mail in eigener DB aktualisieren
+        user.email = email
+        if password:
+            user.password = generate_password_hash(password, method='sha256')
+
+        # To do Clearances updaten
+        db.session.commit()
+        flash('Patient erfolgreich aktualisiert.', "success")
+        return redirect(url_for('main.patient', patient_id=patient_id))
 
 
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET"])
@@ -92,6 +143,7 @@ def patient_ecg(patient_id, ecg_id):
 
     return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, user=current_user,
                            ecg=e, patient=p, diagnosis = d, height=h, weight=w, ecg_data=ecg_data)
+
 
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["POST"])
 @login_required
@@ -138,13 +190,6 @@ def patient_new_post():
         birthdate = request.form.get('birth_date')
 
         # Validate
-        print(firstname)
-        print(lastname)
-        print(username)
-        print(email)
-        print(email_repeat)
-        print(phone)
-        print(birthdate)
         # Alle Felder müssen gesetzt sein
         if not firstname or not lastname or not username or not email or not email_repeat or not phone or not birthdate:
             flash('Alle Felder müssen ausgefüllt sein.', 'error')
@@ -161,7 +206,6 @@ def patient_new_post():
 
             fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female")
             patient_id = "12345"
-            # Todo: Als FHIR-Ressource hinzufügen, FHIR_ID zu Datenbank hinzufügen
 
             password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
             new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \

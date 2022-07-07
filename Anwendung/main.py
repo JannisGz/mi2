@@ -5,7 +5,7 @@ from .models import User as dbUser
 from .models import Clearance
 from sqlalchemy import text
 
-from Anwendung.fhir_interface import FHIRInterface
+from .fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
 

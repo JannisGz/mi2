@@ -1,4 +1,6 @@
-from flask import Blueprint, Flask, render_template, flash, url_for, redirect
+from turtledemo.chaos import f
+
+from flask import Blueprint, Flask, render_template, flash, url_for, redirect, request
 from flask_login import login_required, current_user
 
 main = Blueprint('main', __name__)
@@ -47,7 +49,48 @@ def help_get(patient_id):
     return render_template('help.html', title="Anleitungen", username=current_user.name, patient_id=patient_id)
 
 
-@main.route("/patients/new", methods=["GET", "POST"])
+@main.route("/patients/new", methods=["GET"])
 @login_required
-def patient_post():
+def patient_new():
     return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+
+
+@main.route("/patients/new", methods=["POST"])
+@login_required
+def patient_new_post():
+    # Get form data
+    firstname = request.form.get('first_name')
+    lastname = request.form.get('last_name')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    email_repeat = request.form.get('email_repeat')
+    phone = request.form.get('phone')
+    birthdate = request.form.get('birth_date')
+
+    # Validate
+    print(firstname)
+    print(lastname)
+    print(username)
+    print(email)
+    print(email_repeat)
+    print(phone)
+    print(birthdate)
+    # Alle Felder müssen gesetzt sein
+    if not firstname or not lastname or not username or not email or not email_repeat or not phone or not birthdate:
+        flash('Alle Felder müssen ausgefüllt sein.', 'error')
+        return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+    elif email != email_repeat:
+        flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
+        return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+    else:
+        # Todo: DB Check if already exist
+        # Todo: in DB hinzufügen
+        patient_id = "12345"
+        # Todo: Als FHIR-Ressource hinzufügen
+        flash('Patient erfolgreich hinzugefügt', "success")
+        return redirect(url_for('main.patients', title="Patient " + patient_id, username=current_user.name,
+                                patient_id=patient_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
+
+
+def is_none_or_empty(string) -> bool:
+    return not string

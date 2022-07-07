@@ -19,53 +19,52 @@
             </ol>
         </nav>
 
-        <form>
+        <form method="POST" action="/patients/new">
             <!-- Vorname-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="first_name">Vorname</label>
-                <input type="text" id="first_name" class="form-control" required/>
+                <input type="text" name="first_name" id="first_name" class="form-control" required/>
             </div>
 
             <!-- Nachname-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="last_name">Nachname</label>
-                <input type="test" id="last_name" class="form-control" required/>
+                <input type="text" name="last_name" id="last_name" class="form-control" required/>
             </div>
-
 
             <!-- Benutzername-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="username">Benutzername</label>
-                <input type="text" id="username" class="form-control" required/>
+                <input type="text" name="username" id="username" class="form-control" required/>
             </div>
 
             <!-- E-Mail -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="email">E-Mail-Adresse</label>
-                <input type="email" id="email" class="form-control" required/>
+                <input type="email" name="email" id="email" class="form-control" required/>
             </div>
 
             <!-- E-Mail wiederholen -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="email_repeat">E-Mail-Adresse wiederholen</label>
-                <input type="email" id="email_repeat" class="form-control" required/>
+                <input type="email" name="email_repeat" id="email_repeat" class="form-control" required/>
             </div>
 
             <!-- Telefonnummer -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="phone">Telefonnummer</label>
-                <input type="tel" id="phone" class="form-control" required/>
+                <input type="tel" id="phone" name="phone" class="form-control" required/>
             </div>
 
             <!-- Geburtsdatum -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="birth_date">Geburtsdatum</label>
-                <input class="form-control" type="date" id="birth_date" name="birth_date"
+                <input class="form-control" name="birth_date" type="date" id="birth_date" name="birth_date"
                        value="2022-01-01" required/>
             </div>
 
             <!-- Submit button -->
-            <button type="button" class="btn btn-success btn-block mb-4">Erstellen</button>
+            <input type="submit" class="btn btn-success btn-block mb-4" value="Erstellen"/>
         </form>
     </div>
 

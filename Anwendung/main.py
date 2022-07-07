@@ -42,10 +42,10 @@ def patients():
         patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
                      fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
 
-        return render_template('patients.html', title="Patienten", username=current_user.name, patients=patients)
+        return render_template('patients.html', title="Patienten", user=current_user, patients=patients)
     # Patienten werden auf ihre Patientenseite umgeleitet
     else:
-        return redirect(url_for('main.patient', title="Patient" + str(current_user.fhir_id), username=current_user.name,
+        return redirect(url_for('main.patient', title="Patient" + str(current_user.fhir_id), user=current_user,
                                 patient_id=current_user.fhir_id))
 
 
@@ -58,7 +58,7 @@ def patient(patient_id):
     w = fhir_interface.get_weight(patient_id)
     e = fhir_interface.get_ecgs_with_diagnosis(patient_id)
 
-    return render_template('patient.html', title="Patient " + patient_id, username=current_user.name, patient_id=patient_id,
+    return render_template('patient.html', title="Patient " + patient_id, user=current_user, patient_id=patient_id,
                            patient=p, height=h, weight=w, ecgs=e)
 
 @main.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
@@ -67,7 +67,7 @@ def patient_update(patient_id):
     # Nur Patienten haben hier Zugriff
     if current_user.practise:
         return redirect(url_for('main.patients'))
-    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, username=current_user.name,
+    return render_template('edit_patient.html', title="Daten für Patient " + patient_id, user=current_user,
                            patient_id=patient_id)
 
 
@@ -82,7 +82,7 @@ def patient_ecg(patient_id, ecg_id):
     ecg_data = e.component[0].valueSampledData.data.split(" ")[:-1]
     ecg_data = [float(x) for x in ecg_data]
 
-    return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=current_user.name,
+    return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, user=current_user,
                            ecg=e, patient=p, diagnosis = d, height=h, weight=w, ecg_data=ecg_data)
 
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["POST"])
@@ -102,7 +102,7 @@ def patient_ecg_post(patient_id, ecg_id):
 @main.route("/patients/<patient_id>/help", methods=["GET"])
 @login_required
 def help_get(patient_id):
-    return render_template('help.html', title="Anleitungen", username=current_user.name, patient_id=patient_id)
+    return render_template('help.html', title="Anleitungen", user=current_user, patient_id=patient_id)
 
 
 @main.route("/patients/new", methods=["GET"])
@@ -110,7 +110,7 @@ def help_get(patient_id):
 def patient_new():
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
-        return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+        return render_template('new_patient.html', title="Neuer Patient", user=current_user)
     return redirect(url_for('main.patients'))
 
 
@@ -139,17 +139,17 @@ def patient_new_post():
         # Alle Felder müssen gesetzt sein
         if not firstname or not lastname or not username or not email or not email_repeat or not phone or not birthdate:
             flash('Alle Felder müssen ausgefüllt sein.', 'error')
-            return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+            return render_template('new_patient.html', title="Neuer Patient", user=current_user)
         elif email != email_repeat:
             flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
-            return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+            return render_template('new_patient.html', title="Neuer Patient", user=current_user)
         else:
             # Todo: DB Check if already exist
             # Todo: in DB hinzufügen
             patient_id = "12345"
             # Todo: Als FHIR-Ressource hinzufügen
             flash('Patient erfolgreich hinzugefügt', "success")
-            return redirect(url_for('main.patients', title="Patient " + patient_id, username=current_user.name,
+            return redirect(url_for('main.patients', title="Patient " + patient_id, user=current_user,
                                     patient_id=patient_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
     else:
         return redirect(url_for('main.patients'))

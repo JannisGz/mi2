@@ -39,7 +39,8 @@
 
         <!-- Diagnosen -->
         <hr>
-        <p>Ärztliche Auswertung:</p>
+        <p>Ärztliche Auswertung: </p>
+        {% if user.practise == 1 %}
         <form method="POST" action="/patients/{{ patient.id }}/ecg/{{ ecg.id }}">
 
             <div class="form-check">
@@ -59,9 +60,14 @@
                 </div>
             </div>
 
-
             <input type="submit" class="btn btn-success btn-block my-4" value="Speichern"/>
         </form>
+        {% endif %}
+
+        <p>ICD-10-GM Kodierung: <b>{{ diagnosis }}</b></p>
+        <p>Entspricht: - </p>
+
+
     </div>
 
         <script>

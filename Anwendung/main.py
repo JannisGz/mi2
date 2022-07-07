@@ -204,7 +204,7 @@ def patient_new_post():
                 flash('Der Nutzername existiert bereits.', 'error')
                 return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
 
-            fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female")
+            fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female", username)
             patient_id = "12345"
 
             password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))

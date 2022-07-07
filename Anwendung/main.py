@@ -35,7 +35,6 @@ def getPractisesByClearance(username):
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
-    print("HIer")
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         # TODO fetch all patients with permission
@@ -65,6 +64,9 @@ def patient(patient_id):
 @main.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
 @login_required
 def patient_update(patient_id):
+    # Nur Patienten haben hier Zugriff
+    if current_user.practise:
+        return redirect(url_for('main.patients'))
     return render_template('edit_patient.html', title="Daten für Patient " + patient_id, username=current_user.name,
                            patient_id=patient_id)
 
@@ -86,12 +88,15 @@ def patient_ecg(patient_id, ecg_id):
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["POST"])
 @login_required
 def patient_ecg_post(patient_id, ecg_id):
-    if request.form.get('diagnosis') == "OB":
-        fhir_interface.set_diagnosis(ecg_id, "Ohne Befund")
-    else:
-        fhir_interface.set_diagnosis(ecg_id, request.form.get('icd_code_text'))
+    # Nur Ärzte haben hier Zugriff
+    if current_user.practise:
+        if request.form.get('diagnosis') == "OB":
+            fhir_interface.set_diagnosis(ecg_id, "Ohne Befund")
+        else:
+            fhir_interface.set_diagnosis(ecg_id, request.form.get('icd_code_text'))
 
-    return redirect(url_for('main.patient', patient_id=patient_id))
+        return redirect(url_for('main.patient', patient_id=patient_id))
+    redirect(url_for('main.patient', patient_id=patient_id))
 
 
 @main.route("/patients/<patient_id>/help", methods=["GET"])
@@ -103,44 +108,51 @@ def help_get(patient_id):
 @main.route("/patients/new", methods=["GET"])
 @login_required
 def patient_new():
-    return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+    # Nur Ärzte haben hier Zugriff
+    if current_user.practise:
+        return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+    return redirect(url_for('main.patients'))
 
 
 @main.route("/patients/new", methods=["POST"])
 @login_required
 def patient_new_post():
-    # Get form data
-    firstname = request.form.get('first_name')
-    lastname = request.form.get('last_name')
-    username = request.form.get('username')
-    email = request.form.get('email')
-    email_repeat = request.form.get('email_repeat')
-    phone = request.form.get('phone')
-    birthdate = request.form.get('birth_date')
+    # Nur Ärzte haben hier Zugriff
+    if current_user.practise:
+        # Get form data
+        firstname = request.form.get('first_name')
+        lastname = request.form.get('last_name')
+        username = request.form.get('username')
+        email = request.form.get('email')
+        email_repeat = request.form.get('email_repeat')
+        phone = request.form.get('phone')
+        birthdate = request.form.get('birth_date')
 
-    # Validate
-    print(firstname)
-    print(lastname)
-    print(username)
-    print(email)
-    print(email_repeat)
-    print(phone)
-    print(birthdate)
-    # Alle Felder müssen gesetzt sein
-    if not firstname or not lastname or not username or not email or not email_repeat or not phone or not birthdate:
-        flash('Alle Felder müssen ausgefüllt sein.', 'error')
-        return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
-    elif email != email_repeat:
-        flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
-        return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+        # Validate
+        print(firstname)
+        print(lastname)
+        print(username)
+        print(email)
+        print(email_repeat)
+        print(phone)
+        print(birthdate)
+        # Alle Felder müssen gesetzt sein
+        if not firstname or not lastname or not username or not email or not email_repeat or not phone or not birthdate:
+            flash('Alle Felder müssen ausgefüllt sein.', 'error')
+            return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+        elif email != email_repeat:
+            flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
+            return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+        else:
+            # Todo: DB Check if already exist
+            # Todo: in DB hinzufügen
+            patient_id = "12345"
+            # Todo: Als FHIR-Ressource hinzufügen
+            flash('Patient erfolgreich hinzugefügt', "success")
+            return redirect(url_for('main.patients', title="Patient " + patient_id, username=current_user.name,
+                                    patient_id=patient_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
     else:
-        # Todo: DB Check if already exist
-        # Todo: in DB hinzufügen
-        patient_id = "12345"
-        # Todo: Als FHIR-Ressource hinzufügen
-        flash('Patient erfolgreich hinzugefügt', "success")
-        return redirect(url_for('main.patients', title="Patient " + patient_id, username=current_user.name,
-                                patient_id=patient_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
+        return redirect(url_for('main.patients'))
 
 
 def is_none_or_empty(string) -> bool:

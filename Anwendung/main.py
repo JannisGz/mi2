@@ -3,8 +3,10 @@ from flask_login import login_required, current_user
 from .extensions import db
 from .models import User as dbUser
 from .models import Clearance
+import random, string
+from werkzeug.security import generate_password_hash
 from sqlalchemy import text
-
+from .mail import Mail
 from .fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
@@ -13,6 +15,7 @@ fhir_url = 'http://localhost:8080/fhir'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
+
 
 
 def getPatientsByClearance(practisename):
@@ -144,12 +147,24 @@ def patient_new_post():
             flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
             return render_template('new_patient.html', title="Neuer Patient", user=current_user)
         else:
-            # Todo: DB Check if already exist
-            # Todo: in DB hinzufügen
+            user = dbUser.query.filter_by(
+                username=username).first()
+            if user:
+                flash('Der Nutzername existiert bereits.', 'error')
+                return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+
+            fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female")
             patient_id = "12345"
-            # Todo: Als FHIR-Ressource hinzufügen
+            # Todo: Als FHIR-Ressource hinzufügen, FHIR_ID zu Datenbank hinzufügen
+
+            password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
+            new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
+                              password=generate_password_hash(password, method='sha256'))
+            Mail.send_mail_created(email, username, password)
+            db.session.add(new_User)
+            db.session.commit()
             flash('Patient erfolgreich hinzugefügt', "success")
-            return redirect(url_for('main.patients', title="Patient " + patient_id, user=current_user,
+            return redirect(url_for('main.patients', title="Patient " + patient_id, username=current_user.name,
                                     patient_id=patient_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
     else:
         return redirect(url_for('main.patients'))

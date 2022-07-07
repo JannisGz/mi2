@@ -18,7 +18,7 @@ class User(UserMixin, Model):
     username = Column(db.String(15), unique=True, index=True)
     password = Column(db.String(128))
     practise = Column(db.Boolean, default=False)
-    fhir_id = Column(db.Integer, nullable=True)
+    fhir_id = Column(db.String(128), nullable=True)
 
 
 

@@ -5,6 +5,7 @@ from fhir.resources.patient import Patient
 from fhir.resources.observation import Observation
 from fhir.resources.humanname import HumanName
 from fhir.resources.identifier import Identifier
+from fhir.resources.annotation import Annotation
 from fhir.resources.contactpoint import ContactPoint
 import random
 import time
@@ -160,6 +161,20 @@ class FHIRInterface:
 
         self.client.resource('Patient',**json.loads(patient.json())).save()
 
+    def set_diagnosis(self, ecg_id, icd_10_code=None):
+        ecg = self.get_observation(ecg_id)
+        data = {"text": icd_10_code }
+        note = Annotation(**data)
+        ecg.note = [note]
+
+        self.client.resource('Observation',**json.loads(ecg.json())).save()
+
+    def get_diagnosis(self, ecg_id):
+        ecg = self.get_observation(ecg_id)
+        try:
+            return ecg.note[0].text
+        except:
+            return "-"
 
 '''
 interface = FHIRInterface('http://localhost:8080/fhir')
@@ -173,4 +188,6 @@ print(interface.get_gender("60"))
 print(interface.get_ecgs("60")[0].json())
 print(interface.get_observation("106").json())
 interface.update_patient("61", "new_first1", "new_family1", gender_new="female")
+interface.set_diagnosis("124", "diagnose")
+print(interface.get_diagnosis("124"))
 '''

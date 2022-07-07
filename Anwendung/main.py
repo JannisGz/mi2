@@ -79,6 +79,8 @@ def patients():
     if current_user.practise:
         # TODO fetch all patients with permission
         patient_ids = getPatientsByClearance(current_user.name)
+        while None in patient_ids:
+            patient_ids.remove(None)
         patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
                      fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
 

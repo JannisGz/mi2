@@ -114,7 +114,7 @@ class FHIRInterface:
             if c == 1200:
                 return 0
 
-    def create_patient(self, name_first: str, name_family: str, dob: str, gender: str, identifier=username):
+    def create_patient(self, name_first: str, name_family: str, dob: str, gender: str, identifier: str):
         '''
         :param name_first: String
         :param name_family: String

@@ -137,7 +137,7 @@ class FHIRInterface:
         patient.birthDate = dob
         patient.gender = gender
 
-        self.client.resource('Patient',**json.loads(patient.json())).save()
+        self.client.resource('Patient', **json.loads(patient.json())).save()
 
         return self.get_id(name_first, name_family, identifier)
 

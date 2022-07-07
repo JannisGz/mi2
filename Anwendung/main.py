@@ -237,17 +237,18 @@ def patient_new_post():
                 return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
 
             fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female", username)
-            patient_id = "12345"
+            print(fhir_id)
 
             password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
             new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
                               password=generate_password_hash(password, method='sha256'))
-            Mail.send_mail_created(email, username, password)
+
             db.session.add(new_User)
             db.session.commit()
+            Mail.send_mail_created(email, username, password)
             flash('Patient erfolgreich hinzugefügt', "success")
-            return redirect(url_for('main.patients', title="Patient " + patient_id, username=current_user.name,
-                                    patient_id=patient_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
+            return redirect(url_for('main.patients', title="Patient " + fhir_id, username=current_user.name,
+                                    patient_id=fhir_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
     else:
         return redirect(url_for('main.patients'))
 

@@ -18,9 +18,6 @@ def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
     remember = True
-    print(email)
-    print(username)
-    print(password)
 
     user = User.query.filter_by(name=username).first()
 

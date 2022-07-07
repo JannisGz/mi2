@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 from Anwendung.fhir_interface import FHIRInterface
@@ -36,7 +36,7 @@ def patient_update(patient_id):
                            patient_id=patient_id)
 
 
-@main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET", "POST"])
+@main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET"])
 @login_required
 def patient_ecg(patient_id, ecg_id):
     p = fhir_interface.get_patient(patient_id)
@@ -49,6 +49,16 @@ def patient_ecg(patient_id, ecg_id):
 
     return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=current_user.name,
                            ecg=e, patient=p, diagnosis = d, height=h, weight=w, ecg_data=ecg_data)
+
+@main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["POST"])
+@login_required
+def patient_ecg_post(patient_id, ecg_id):
+    if request.form.get('diagnosis') == "OB":
+        fhir_interface.set_diagnosis(ecg_id, "Ohne Befund")
+    else:
+        fhir_interface.set_diagnosis(ecg_id, request.form.get('icd_code_text'))
+
+    return redirect(url_for('main.patient', patient_id=patient_id))
 
 
 @main.route("/patients/<patient_id>/help", methods=["GET"])

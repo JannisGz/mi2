@@ -18,10 +18,11 @@ def login_post():
     password = request.form.get('password')
     remember = True
 
-    user = User.query.filter_by(name=username).first()
+    user = User.query.filter_by(username=username).first()
 
     # Überprüfe Zugangsdaten
     if not user or not check_password_hash(user.password, password):
+
         # Bei ungültigen Zugangsdaten auf Login-Seite zurück mit Fehlermeldung
         flash('Ungültige Zugangsdaten.', 'error')
         return redirect(url_for('auth.login'))

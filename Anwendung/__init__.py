@@ -1,10 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-
+from extensions import db
 # init SQLAlchemy so we can use it later in our models
-db = SQLAlchemy()
-
 def create_app():
     app = Flask(__name__)
 

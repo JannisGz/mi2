@@ -1,5 +1,9 @@
 from flask import Blueprint, Flask, render_template, flash
 from flask_login import login_required, current_user
+from .extensions import db
+from .models import User as dbUser
+from .models import Clearance
+from sqlalchemy import text
 
 main = Blueprint('main', __name__)
 
@@ -7,10 +11,28 @@ main = Blueprint('main', __name__)
 username = "Max Mustermann"
 
 
+def getPatientsByClearance(practisename):
+    patients = list()
+    query = Clearance.query.filter_by(practisename=practisename) \
+                .join(dbUser, dbUser.username == Clearance.practisename)
+    for row in query:
+        patients.append(row.fhri_id)
+    return patients
+
+def getPractisesByClearance(username):
+    practises = list()
+    query = Clearance.query.filter_by(username=username) \
+        .join(dbUser, dbUser.username == Clearance.practisename)
+    for row in query:
+        practises.append((row.practisename, row.fhir_id))
+    return practises
+
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
-    return render_template('patients.html', title="Patienten", username=current_user.name)
+
+   return render_template('patients.html', title="Patienten", username=current_user.name)
+
 
 
 @main.route("/patients/<patient_id>", methods=["GET"])

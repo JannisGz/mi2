@@ -105,7 +105,8 @@ def patient_ecg_post(patient_id, ecg_id):
 @main.route("/patients/<patient_id>/help", methods=["GET"])
 @login_required
 def help_get(patient_id):
-    return render_template('help.html', title="Anleitungen", user=current_user, patient_id=patient_id)
+    p = fhir_interface.get_patient(patient_id)
+    return render_template('help.html', title="Anleitungen", user=current_user, patient=p, server_url=fhir_url)
 
 
 @main.route("/patients/new", methods=["GET"])

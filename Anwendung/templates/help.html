@@ -8,7 +8,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-white px-0">
                 <li class="breadcrumb-item"><a href="/patients">Patienten</a></li>
-                <li class="breadcrumb-item"><a href="/patients/{{ patient_id }}">Patient {{ patient_id }}</a></li>
+                <li class="breadcrumb-item"><a href="/patients/{{ patient.id }}">Patient {{ patient.id }}</a></li>
                 <li class="breadcrumb-item">Anleitungen</li>
             </ol>
         </nav>
@@ -18,10 +18,16 @@
                  alt="Einthoven Screen">
             <div class="card-body">
                 <h5 class="card-title">Freigeben von EKGs</h5>
-                <p class="card-text">Wie man die Einthoven-App verwendet. Verweis auf Serveradresse und Benutzer-Id</p>
+                <p class="card-text">Nach dem Aufnehmen von EKGs mit der Apple Watch oder der Eingabe von Körpergröße
+                oder Gewicht in der Health App, können diese mittels der Einthoven App freigegeben werden.</p>
+                <p class="card-text">
+                    Für die Serveradresse ist die Adresse <b>{{ server_url }}</b> und für die Patienten-Id Ihre Id
+                    <b> {{ patient.id }} </b> anzugeben. Danach können zum Freigeben der Daten
+                    die Schaltflächen <b>Synchronize ECG records</b>
+                    und <b>Synchronize Patient Data</b> getippt werden.</p>
             </div>
         </div>
-
+    </div>
         {% include "footer.html" %}
 
 {% endblock %}

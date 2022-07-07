@@ -111,7 +111,7 @@ class FHIRInterface:
                 if patient.identifier[0].id == rand_identifier:
                     return patient.id
             c += 1
-            if c == 120:
+            if c == 600:
                 return 0
 
     def create_patient(self, name_first: str, name_family: str, dob: str, gender: str):

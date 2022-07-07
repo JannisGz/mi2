@@ -22,18 +22,24 @@ class FHIRInterface:
         :param patient_id:
         :return: Observation object of last updated height
         '''
-        patient =  self.patients_resources.search(_id=patient_id).first()
-        observation = self.observation_resources.search(subject=patient, code="8302-2").sort("_lastUpdated").fetch_all()[-1]
-        return Observation.parse_obj(observation)
+        try:
+            patient =  self.patients_resources.search(_id=patient_id).first()
+            observation = self.observation_resources.search(subject=patient, code="8302-2").sort("_lastUpdated").fetch_all()[-1]
+            return str(observation.valueQuantity["value"]) + " " + str(observation.valueQuantity["unit"])
+        except:
+            return "keine Messung vorhanden"
 
     def get_weight(self, patient_id: str):
         '''
         :param patient_id:
         :return: Observation object of last updated weight
         '''
-        patient =  self.patients_resources.search(_id=patient_id).first()
-        observation = self.observation_resources.search(subject=patient, code="29463-7").sort("_lastUpdated").fetch_all()[-1]
-        return Observation.parse_obj(observation)
+        try:
+            patient =  self.patients_resources.search(_id=patient_id).first()
+            observation = self.observation_resources.search(subject=patient, code="29463-7").sort("_lastUpdated").fetch_all()[-1]
+            return str(observation.valueQuantity["value"]) + " " + str(observation.valueQuantity["unit"])
+        except:
+            return "keine Messung vorhanden"
 
     def get_patient(self, patient_id: str):
         '''

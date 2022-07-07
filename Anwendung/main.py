@@ -14,9 +14,26 @@ username = "Max Mustermann"
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
+
+    # TODO fetch all patients with permission
+    patient_ids = ["60", "61"]
+    patients = [fhir_interface.get_patient(id) for id in patient_ids]
+    print(patients)
+
+
+    return render_template('patients.html', title="Patienten", username=current_user.name, patients=patients)
+
+
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
-        return render_template('patients.html', title="Patienten", username=current_user.name)
+
+        # TODO fetch all patients with permission
+        patient_ids = ["60"]
+        patients = [fhir_interface.get_patient(id) for id in patient_ids]
+        print(patients)
+
+
+        return render_template('patients.html', title="Patienten", username=current_user.name, patients=patients)
     # Patienten werden auf ihre Patientenseite umgeleitet
     else:
         return redirect(url_for('main.patient', title="Patient" + str(current_user.fhir_id), username=current_user.name,

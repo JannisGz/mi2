@@ -11,7 +11,7 @@ from .fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
 
-fhir_url = 'http://localhost:8080/fhir'
+fhir_url = 'http://192.168.85.121:8080/fhir'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
@@ -154,7 +154,7 @@ def patient_new_post():
                 flash('Der Nutzername existiert bereits.', 'error')
                 return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
 
-            fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female")
+            fhir_id = "5" #fhir_interface.create_patient(firstname, lastname, birthdate, "female")
             patient_id = "12345"
             # Todo: Als FHIR-Ressource hinzufügen, FHIR_ID zu Datenbank hinzufügen
 

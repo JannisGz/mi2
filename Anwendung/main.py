@@ -8,10 +8,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
 from .mail import Mail
 from .fhir_interface import FHIRInterface
+import multiprocessing as mp
 
 main = Blueprint('main', __name__)
 
-fhir_url = 'http://192.168.85.121:8080/fhir'
+fhir_url = 'http://localhost:8080/fhir'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
@@ -245,7 +246,8 @@ def patient_new_post():
 
             db.session.add(new_User)
             db.session.commit()
-            Mail.send_mail_created(email, username, password)
+            proc = mp.Process(target = Mail.send_mail_created, args = (email, username, password))
+            proc.start()
             flash('Patient erfolgreich hinzugefügt', "success")
             return redirect(url_for('main.patients', title="Patient " + fhir_id, username=current_user.name,
                                     patient_id=fhir_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))

@@ -131,11 +131,35 @@ class FHIRInterface:
         patient.birthDate = dob
         patient.gender = gender
 
-        print(patient.json())
-
         self.client.resource('Patient',**json.loads(patient.json())).save()
 
         return self.get_id(name_first, name_family, rand)
+
+    def update_patient(self, id: str, name_first_new=None, name_family_new=None, dob_new=None, gender_new=None):
+        """
+        updates name (first & last), birthdate and gender
+        :param id:
+        :param name_first_new:
+        :param name_family_new:
+        :param dob_new:
+        :param gender_new:
+        :return: -
+        """
+        patient = self.get_patient(id)
+        name = HumanName.parse_obj(patient.name[0])
+        if name_family_new != None:
+            name.family = name_family_new
+        if name_first_new != None:
+            name.given = [name_first_new]
+        patient.name = [name]
+
+        if dob_new != None:
+            patient.birthDate = dob_new
+        if gender_new != None:
+            patient.gender = gender_new
+
+        self.client.resource('Patient',**json.loads(patient.json())).save()
+
 
 '''
 interface = FHIRInterface('http://localhost:8080/fhir')
@@ -148,4 +172,5 @@ print(interface.get_dob("60"))
 print(interface.get_gender("60"))
 print(interface.get_ecgs("60")[0].json())
 print(interface.get_observation("106").json())
+interface.update_patient("61", "new_first1", "new_family1", gender_new="female")
 '''

@@ -176,6 +176,13 @@ class FHIRInterface:
         except:
             return "-"
 
+    def get_ecgs_with_diagnosis(self, patient_id):
+        ecgs = self.get_ecgs(patient_id)
+        ecg_diagnosis = []
+        for ecg in ecgs:
+            ecg_diagnosis.append((ecg, self.get_diagnosis(ecg.id)))
+        return ecg_diagnosis
+
 '''
 interface = FHIRInterface('http://localhost:8080/fhir')
 print(interface.create_patient("First", "Last", "2020-01-01", "male"))

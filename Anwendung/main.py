@@ -1,8 +1,12 @@
-from flask import Blueprint, Flask, render_template, flash
+from flask import Blueprint, render_template
 from flask_login import login_required, current_user
+
+from Anwendung.fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
 
+fhir_url = 'http://localhost:8080/fhir'
+fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
 
@@ -16,8 +20,13 @@ def patients():
 @main.route("/patients/<patient_id>", methods=["GET"])
 @login_required
 def patient(patient_id):
+    p = fhir_interface.get_patient(patient_id)
+    h = fhir_interface.get_height(patient_id)
+    w = fhir_interface.get_weight(patient_id)
+    e = fhir_interface.get_ecgs_with_diagnosis(patient_id)
+
     return render_template('patient.html', title="Patient " + patient_id, username=current_user.name, patient_id=patient_id,
-                           patient_name="Wolf, Dieter", birth_date="01.03.1947")
+                           patient=p, height=h, weight=w, ecgs=e)
 
 
 @main.route("/patients/<patient_id>/edit", methods=["GET", "POST"])
@@ -30,8 +39,15 @@ def patient_update(patient_id):
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET", "POST"])
 @login_required
 def patient_ecg(patient_id, ecg_id):
+    p = fhir_interface.get_patient(patient_id)
+    name = str(p.name[0].family) + ", " + str(p.name[0].given[0])
+    dob = str(p.birthDate)
+
+    ecg = fhir_interface.get_observation(ecg_id)
+    #ecg.
+
     return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, username=current_user.name,
-                           patient_id=patient_id, ecg_id=ecg_id, patient_name="Wolf, Dieter", birth_date="01.03.1947", ecg_datetime="01.07.2022")
+                           patient_id=patient_id, ecg_id=ecg_id, patient_name=name, birth_date=dob, ecg_datetime="01.07.2022")
 
 
 @main.route("/patients/<patient_id>/help", methods=["GET"])

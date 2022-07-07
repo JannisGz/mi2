@@ -11,10 +11,11 @@ from .fhir_interface import FHIRInterface
 
 main = Blueprint('main', __name__)
 
-fhir_url = 'http://192.168.85.121:8080/fhir'
+fhir_url = 'http://localhost:8080/fhir'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
+
 
 def getAllPractises():
     """
@@ -26,6 +27,7 @@ def getAllPractises():
     for practise in query:
         practises.append((practise.name, practise.id))
     return practises
+
 
 def getPatientsByClearance(practisename):
     """
@@ -55,15 +57,49 @@ def getPractisesByClearance(username):
         practises.append((practise.name, practise.id))
     return practises
 
+
 def setClearance(username, practisename):
     try:
-        query = Clearance.query.filter_by(username=username,  practisename=practisename).one()
+        query = Clearance.query.filter_by(username=username, practisename=practisename).one()
         db.session.delete(query)
     except:
         clr = Clearance(username=username, practisename=practisename)
         db.session.add(clr)
     db.session.commit()
+    Clearance.query.filter_by().one()
     return
+
+
+def add_clearance(user_name, practice):
+    """
+    Fügt eine Freigabe für einen Benutzer fest.
+
+    :param user_name: Name des Benutzers dessen Daten freigegeben werden
+    :param practices: Praxen/Ärzte für welche die Daten freigegeben werden
+    :return: void
+    """
+    # Neue Freigaben hinzufügen
+    clr = Clearance(username=user_name, practisename=practice)
+    db.session.add(clr)
+    db.session.commit()
+
+
+def set_clearances(user_name, practices):
+    """
+    Legt die Freigaben für einen Benutzer fest.
+
+    :param user_name: Name des Benutzers dessen Daten freigegeben werden
+    :param practices: Praxen/Ärzte für welche die Daten freigegeben werden
+    :return: void
+    """
+    # Alte Freigaben löschen
+    clearances = db.session.query(Clearance).filter(Clearance.username == user_name)
+    clearances.delete(synchronize_session=False)
+    # Neue Freigaben hinzufügen
+    for practice in practices:
+        clr = Clearance(username=user_name, practisename=practice)
+        db.session.add(clr)
+    db.session.commit()
 
 
 @main.route("/testroute", methods=["GET"])
@@ -72,15 +108,16 @@ def testfunc():
     print(result)
     return render_template('login.html', title="Login")
 
+
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
-        # TODO fetch all patients with permission
         patient_ids = getPatientsByClearance(current_user.name)
-        patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
-                     fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
+
+        patients = [(fhir_interface.get_patient(str(id)), len(fhir_interface.get_ecgs_new(str(id))),
+                     fhir_interface.get_ecg_newest_date(str(id))) for id in patient_ids]
 
         return render_template('patients.html', title="Patienten", user=current_user, patients=patients)
     # Patienten werden auf ihre Patientenseite umgeleitet
@@ -97,8 +134,10 @@ def patient(patient_id):
     w = fhir_interface.get_weight(patient_id)
     e = fhir_interface.get_ecgs_with_diagnosis(patient_id)
 
+    clearances = getPractisesByClearance(current_user.username)
+
     return render_template('patient.html', title="Patient " + patient_id, user=current_user, patient_id=patient_id,
-                           patient=p, height=h, weight=w, ecgs=e)
+                           patient=p, height=h, weight=w, ecgs=e, clearances=clearances)
 
 
 @main.route("/patients/<patient_id>/edit", methods=["GET"])
@@ -107,9 +146,12 @@ def patient_update(patient_id):
     # Nur Patienten haben hier Zugriff
     if current_user.practise:
         return redirect(url_for('main.patients'))
-    p = fhir_interface.get_patient(patient_id)
+    edited_patient = fhir_interface.get_patient(patient_id)
+    all_practices = getAllPractises()
+    clearances = getPractisesByClearance(current_user.username)
     return render_template('edit_patient.html', title="Patient bearbeiten " + patient_id, user=current_user,
-                           patient=p, current_user=current_user)
+                           patient=edited_patient, current_user=current_user, practices=all_practices,
+                           clearances=clearances)
 
 
 @main.route("/patients/<patient_id>/edit", methods=["POST"])
@@ -125,8 +167,7 @@ def patient_update_post(patient_id):
     password = request.form.get('password')
     password_old = request.form.get('password_old')
     password_repeat = request.form.get('password_repeat')
-    # Todo: Echt Ids zurückgeben. Im Moment Platzhalter
-    clearances = request.form.get('clearance')
+    clearances = request.form.getlist('clearance')
 
     # Validate
     # Alle Felder müssen gesetzt sein (außer Passwort-Neu und Wiederholen)
@@ -154,8 +195,11 @@ def patient_update_post(patient_id):
         if password:
             user.password = generate_password_hash(password, method='sha256')
 
-        # To do Clearances updaten
         db.session.commit()
+
+        # Freigaben aktualisieren
+        set_clearances(current_user.username, clearances)
+
         flash('Patient erfolgreich aktualisiert.', "success")
         return redirect(url_for('main.patient', patient_id=patient_id))
 
@@ -171,8 +215,17 @@ def patient_ecg(patient_id, ecg_id):
     ecg_data = e.component[0].valueSampledData.data.split(" ")[:-1]
     ecg_data = [float(x) for x in ecg_data]
 
+    # Konvertiere Diagnose in Radiobutton (0 = Keine Diagnose, 1 = ohne Befund, 2 = ICD-Code vorhanden)
+    if d is None or d == "-" or d == "":
+        diagnosis_radio = 0
+    elif d == "ohne Befund":
+        diagnosis_radio = 1
+    else:
+        diagnosis_radio = 2
+
     return render_template('ecg.html', title="EKG " + ecg_id + " für Patient " + patient_id, user=current_user,
-                           ecg=e, patient=p, diagnosis = d, height=h, weight=w, ecg_data=ecg_data)
+                           ecg=e, patient=p, diagnosis=d, height=h, weight=w, ecg_data=ecg_data,
+                           diagnosis_radio=diagnosis_radio)
 
 
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["POST"])
@@ -185,8 +238,10 @@ def patient_ecg_post(patient_id, ecg_id):
         else:
             fhir_interface.set_diagnosis(ecg_id, request.form.get('icd_code_text'))
 
-        return redirect(url_for('main.patient', patient_id=patient_id))
-    redirect(url_for('main.patient', patient_id=patient_id))
+        flash('Auswertung gespeichert.', "success")
+        return redirect(url_for('main.patient_ecg', patient_id=patient_id, ecg_id=ecg_id))
+
+    return redirect(url_for('main.patient', patient_id=patient_id))
 
 
 @main.route("/patients/<patient_id>/help", methods=["GET"])
@@ -223,25 +278,27 @@ def patient_new_post():
         # Alle Felder müssen gesetzt sein
         if not firstname or not lastname or not username or not email or not email_repeat or not phone or not birthdate:
             flash('Alle Felder müssen ausgefüllt sein.', 'error')
-            return render_template('new_patient.html', title="Neuer Patient", user=current_user)
+            return redirect(url_for('main.patient_new'))
         elif email != email_repeat:
             flash('Die gesetzten E-Mail-Adressen müssen identisch sein.', 'error')
-            return render_template('new_patient.html', title="Neuer Patient", user=current_user)
+            return redirect(url_for('main.patient_new'))
         else:
             user = dbUser.query.filter_by(
                 username=username).first()
             if user:
                 flash('Der Nutzername existiert bereits.', 'error')
-                return render_template('new_patient.html', title="Neuer Patient", username=current_user.name)
+                return redirect(url_for('main.patient_new'))
 
             fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female")
             print(fhir_id)
 
-            password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
-            new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
+            password = lastname + ''.join(random.choice(string.ascii_letters) for i in range(4))
+            new_User = dbUser(email=email, name=firstname + " " + lastname, username=username, practise=False,
+                              fhir_id=fhir_id, \
                               password=generate_password_hash(password, method='sha256'))
 
             db.session.add(new_User)
+            add_clearance(username, current_user.name)
             db.session.commit()
             Mail.send_mail_created(email, username, password)
             flash('Patient erfolgreich hinzugefügt', "success")

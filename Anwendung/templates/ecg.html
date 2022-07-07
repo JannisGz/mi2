@@ -39,11 +39,11 @@
         <form method="POST" action="/patients/{{ patient.id }}/ecg/{{ ecg.id }}">
 
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="diagnosis" id="withoutFindings" value="OB" checked>
+                <input class="form-check-input" type="radio" name="diagnosis" id="withoutFindings" value="OB" {%  if diagnosis_radio == 1 %}checked{%  endif %}>
                 <label class="form-check-label" for="withoutFindings">Ohne Befund</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="diagnosis" id="icd_code" value="ICD">
+                <input class="form-check-input" type="radio" name="diagnosis" id="icd_code" value="ICD" {%  if diagnosis_radio == 2 %}checked{%  endif %}>
                 <label class="form-check-label" for="icd_code">ICD-10-GM Kodierung:</label>
 
                 <div id="icd_code_area" style="display: block;">

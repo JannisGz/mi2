@@ -140,6 +140,8 @@ class FHIRInterface:
 
         self.client.resource('Patient', **json.loads(patient.json())).save()
 
+        time.sleep(3)
+
         return self.get_id(name_first, name_family, str(rand))
 
     def update_patient(self, id: str, name_first_new=None, name_family_new=None, dob_new=None, gender_new=None):

@@ -24,25 +24,29 @@
             <!-- Vorname-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="first_name">Vorname</label>
-                <input type="text" id="first_name" name="first_name" class="form-control" value="{{ patient.name[0].given[0] }}" required/>
+                <input type="text" id="first_name" name="first_name" class="form-control"
+                       value="{{ patient.name[0].given[0] }}" required/>
             </div>
 
             <!-- Nachname-->
             <div class="form-outline mb-3">
                 <label class="form-label" for="last_name">Nachname</label>
-                <input type="test" id="last_name" name="last_name" class="form-control" value="{{ patient.name[0].family }}" required/>
+                <input type="test" id="last_name" name="last_name" class="form-control"
+                       value="{{ patient.name[0].family }}" required/>
             </div>
 
             <!-- E-Mail -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="email">E-Mail-Adresse</label>
-                <input type="email" id="email" name="email" class="form-control" value="{{ current_user.email }}" required/>
+                <input type="email" id="email" name="email" class="form-control" value="{{ current_user.email }}"
+                       required/>
             </div>
 
             <!-- E-Mail wiederholen -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="email_repeat">E-Mail-Adresse wiederholen</label>
-                <input type="email" id="email_repeat" name="email_repeat" value="{{ current_user.email }}" class="form-control"/>
+                <input type="email" id="email_repeat" name="email_repeat" value="{{ current_user.email }}"
+                       class="form-control"/>
             </div>
 
             <!-- Telefonnummer -->
@@ -52,14 +56,17 @@
             </div>
 
             <!-- Datenfreigabe -->
-            <!-- To do clearances -->
             <div class="form-outline mb-4">
                 <label class="form-label" for="clearance">Daten freigegeben für:</label>
                 </br>
                 <select name="clearance" class="select form-control" multiple id="clearance">
-                    <option value="1" selected>Praxis Dr. med. Jürgen Fischer</option>
-                    <option value="2">Hausärztin Dr. med. Janina Müller</option>
-                    <option value="3">Hausarztpraxis Bert Meier</option>
+                    {% for practice in practices %}
+                        {% if practice in clearances %}
+                            <option value="{{ practice[0] }}" selected>{{ practice[0] }}</option>
+                        {% else %}
+                            <option value="{{ practice[0] }}">{{ practice[0] }}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
             </div>
 

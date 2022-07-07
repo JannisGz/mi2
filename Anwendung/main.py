@@ -38,10 +38,15 @@ def getPractisesByClearance(username):
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
-
+    print("HIer")
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
-        return render_template('patients.html', title="Patienten", username=current_user.name)
+        # TODO fetch all patients with permission
+        patient_ids = ["60", "61"]
+        patients = [(fhir_interface.get_patient(id), len(fhir_interface.get_ecgs_new(id)),
+                     fhir_interface.get_ecg_newest_date(id)) for id in patient_ids]
+
+        return render_template('patients.html', title="Patienten", username=current_user.name, patients=patients)
     # Patienten werden auf ihre Patientenseite umgeleitet
     else:
         return redirect(url_for('main.patient', title="Patient" + str(current_user.fhir_id), username=current_user.name,

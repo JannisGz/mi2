@@ -23,8 +23,8 @@
         </nav>
 
         <!-- Gewicht, Größe -->
-        <p><b>Letzte Körpergröße: </b>{{ height.valueQuantity.value }} {{ height.valueQuantity.unit }}</p>
-        <p><b>Letztes Gewicht: </b>{{ weight.valueQuantity.value }} {{ weight.valueQuantity.unit }}</p>
+        <p><b>Letzte Körpergröße: </b>{{height}}</p>
+        <p><b>Letztes Gewicht: </b>{{weight}}</p>
         <p><b>Letzte Aktualisierung: </b>{{ ecg.meta.lastUpdated.strftime("%Y-%m-%d %H:%M:%S") }}</p>
 
         <!-- EKG Visualisierung-->
@@ -87,7 +87,7 @@
 
             let data = {{ ecg_data }}
 
-            let height = 130;
+            let height = 200;
             c.height = height
             let y_zero = height / 2.0;
             let x = 0;
@@ -106,7 +106,7 @@
                 ctx.stroke();
             }
 
-            for (let i = 1; i < 5; i++) {
+            for (let i = 1; i < 10; i++) {
                 ctx.strokeStyle = "rgb(205,207,210)";
                 ctx.lineWidth = 1
                 ctx.beginPath();

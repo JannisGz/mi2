@@ -12,7 +12,9 @@ import multiprocessing as mp
 
 main = Blueprint('main', __name__)
 
-fhir_url = 'http://192.168.85.121:8080/fhir'
+url_base = 'http://192.168.85.121'
+fhir_url = url_base + ':8080/fhir'
+web_url = url_base + ':5001'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
@@ -303,7 +305,7 @@ def patient_new_post():
             db.session.add(new_User)
             add_clearance(username, current_user.username)
             db.session.commit()
-            proc = mp.Process(target = Mail.send_mail_created, args = (email, username, password))
+            proc = mp.Process(target = Mail.send_mail_created, args = (email, username, password, web_url))
             proc.start()
             flash('Patient hinzugefügt. Ein Passwort wird per Mail versand, dies kann wenige Minuten dauern.', "success")
             return redirect(url_for('main.patients', title="Patient " + fhir_id, username=current_user.name,

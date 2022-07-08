@@ -13,7 +13,7 @@ gmail_pwd = "qzkigrfvlolpqwuz"
 class Mail:
 
 
-    def send_mail(address):
+    def send_mail(address, web_address):
         msg = EmailMessage()
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -24,7 +24,7 @@ class Mail:
 
         subject  =  'Änderung in Ihren Diagnosen vom '+ str(datetime.date.today())
         body = 'Ihr Arzt hat soeben eine Diagnose zu Ihrem EKG hinzugefuegt. \n' \
-               'Sie koennen diese unter http:0.0.0.0:8080 einsehen'
+               'Sie koennen diese unter ' + web_address +' einsehen'
         msg['Subject'] = "Es gibt neue Diagnosen bei Pulse"
         msg['From'] = gmail_user
         msg['To'] = address
@@ -38,7 +38,7 @@ class Mail:
         except Exception as e:
             print(e)
 
-    def send_mail_created(address, username, password):
+    def send_mail_created(address, username, password, web_address):
         msg = EmailMessage()
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -50,7 +50,7 @@ class Mail:
         subject = "Herzlich willkommnen bei Pulse"
         body = "Ihr Arzt hat soeben einen Nutzeraccount für Pulse angelegt." \
                f"Sie können sich ab sofort mit Ihrem Nutzernamen {username} und " \
-               f"dem sicher generierten Passwort \"{password}\" unter 127.0.0.1:5000 einloggen"
+               f"dem sicher generierten Passwort \"{password}\" unter " + web_address + " einloggen"
         msg['Subject'] = "Herzlich willkommen bei Pulse"
         msg['From'] = gmail_user
         msg['To'] = address

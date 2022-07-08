@@ -12,7 +12,7 @@ import multiprocessing as mp
 
 main = Blueprint('main', __name__)
 
-fhir_url = 'http://localhost:8080/fhir'
+fhir_url = 'http://192.168.85.121:8080/fhir'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"
@@ -26,7 +26,7 @@ def getAllPractises():
     practises = list()
     query = dbUser.query.filter_by(practise=True)
     for practise in query:
-        practises.append((practise.name, practise.id))
+        practises.append((practise.username, practise.id, practise.name))
     return practises
 
 
@@ -55,7 +55,7 @@ def getPractisesByClearance(username):
         .join(dbUser, dbUser.username == Clearance.practisename)
     for row in query:
         practise = dbUser.query.filter_by(username=row.practisename).one()
-        practises.append((practise.name, practise.id))
+        practises.append((practise.username, practise.id, practise.name))
     return practises
 
 
@@ -106,7 +106,6 @@ def set_clearances(user_name, practices):
 @main.route("/testroute", methods=["GET"])
 def testfunc():
     result = setClearance("Patient1", "Musterpraxis")
-    print(result)
     return render_template('login.html', title="Login")
 
 
@@ -115,7 +114,7 @@ def testfunc():
 def patients():
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
-        patient_ids = getPatientsByClearance(current_user.name)
+        patient_ids = getPatientsByClearance(current_user.username)
 
         while None in patient_ids:
             patient_ids.remove(None)
@@ -139,8 +138,10 @@ def patient(patient_id):
 
     clearances = getPractisesByClearance(current_user.username)
 
+    patient = dbUser.query.filter_by(fhir_id=patient_id).one()
+
     return render_template('patient.html', title="Patient " + patient_id, user=current_user, patient_id=patient_id,
-                           patient=p, height=h, weight=w, ecgs=e, clearances=clearances)
+                           patient=p, height=h, weight=w, ecgs=e, clearances=clearances, patient2=patient)
 
 
 @main.route("/patients/<patient_id>/edit", methods=["GET"])
@@ -185,8 +186,7 @@ def patient_update_post(patient_id):
         return redirect(url_for('main.patient_update', patient_id=patient_id))
     else:
         # Altes Passwort (password_old) überprüfen
-        user = dbUser.query.filter_by(username=current_user.name).first()
-
+        user = dbUser.query.filter_by(username=current_user.username).first()
         if not user or not check_password_hash(user.password, password_old):
             flash('Ungültige Zugangsdaten.', 'error')
             return redirect(url_for('main.patient_update', patient_id=patient_id))
@@ -295,18 +295,17 @@ def patient_new_post():
                 return redirect(url_for('main.patient_new'))
 
             fhir_id = fhir_interface.create_patient(firstname, lastname, birthdate, "female", username)
-            print(fhir_id)
 
             password = lastname+''.join(random.choice(string.ascii_letters) for i in range(4))
             new_User = dbUser(email=email, name=firstname+" "+lastname, username=username,practise=False, fhir_id=fhir_id, \
                               password=generate_password_hash(password, method='sha256'), telephone=phone)
 
             db.session.add(new_User)
-            add_clearance(username, current_user.name)
+            add_clearance(username, current_user.username)
             db.session.commit()
             proc = mp.Process(target = Mail.send_mail_created, args = (email, username, password))
             proc.start()
-            flash('Patient erfolgreich hinzugefügt', "success")
+            flash('Patient hinzugefügt. Ein Passwort wird per Mail versand, dies kann wenige Minuten dauern.', "success")
             return redirect(url_for('main.patients', title="Patient " + fhir_id, username=current_user.name,
                                     patient_id=fhir_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
     else:

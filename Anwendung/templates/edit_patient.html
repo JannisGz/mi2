@@ -62,9 +62,9 @@
                 <select name="clearance" class="select form-control" multiple id="clearance">
                     {% for practice in practices %}
                         {% if practice in clearances %}
-                            <option value="{{ practice[0] }}" selected>{{ practice[0] }}</option>
+                            <option value="{{ practice[0] }}" selected>{{ practice[2] }}</option>
                         {% else %}
-                            <option value="{{ practice[0] }}">{{ practice[0] }}</option>
+                            <option value="{{ practice[0] }}">{{ practice[2] }}</option>
                         {% endif %}
                     {% endfor %}
                 </select>

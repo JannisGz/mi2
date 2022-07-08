@@ -24,13 +24,13 @@
                 {% if user.practise == 0 %}
                     <p class="card-text"><b>Benutzername: </b>{{ user.username }}</p>
                 {% endif %}
-                <p class="card-text"><b>E-Mail: </b> {{ user.email }} </p>
-                <p class="card-text"><b>Telefonnummer: </b>{{ user.telephone }}</p>
+                <p class="card-text"><b>E-Mail: </b> {{ patient2.email }} </p>
+                <p class="card-text"><b>Telefonnummer: </b>{{ patient2.telephone }}</p>
                 {% if user.practise == 0 %}
                     <p class="card-text"><b>Freigegeben für: </b>
                     <ul class="inline">
                         {% for clearance in clearances %}
-                            <li>{{ clearance[0] }}</li>
+                            <li>{{ clearance[2] }}</li>
                         {% endfor %}
                     </ul>
                     <a href="/patients/{{ patient.id }}/edit" class="btn btn-secondary">Bearbeiten <i

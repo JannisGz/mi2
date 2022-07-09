@@ -9,11 +9,21 @@ auth = Blueprint('auth', __name__)
 
 @auth.route("/", methods=["GET"])
 def login():
+    """
+    Zeigt die Login-Seite an.
+
+    :return: Template der Login-Seite
+    """
     return render_template('login.html', title="Login")
 
 
 @auth.route("/", methods=["POST"])
 def login_post():
+    """
+    Wertet das Login-Formular aus. Bei validen Zugangsdaten wird der Benutzer auf seine Startseite weitergeleitet.
+
+    :return: Template der Patienten-Übersicht für Ärzte, Patienten-Einzel-Ansicht für Patienten
+    """
     username = request.form.get('username')
     password = request.form.get('password')
     remember = True
@@ -35,17 +45,32 @@ def login_post():
 @auth.route('/logout')
 @login_required
 def logout():
+    """
+    Meldet den Benutzer ab.
+
+    :return: Template der Login-Seite
+    """
     logout_user()
     return redirect(url_for('auth.login', titel="Login"))
 
 
 @auth.route('/signup')
 def signup():
+    """
+    Zeigt die Registrierungsseite an.
+
+    :return: Tempalte der Registrierungsseite
+    """
     return render_template('signup.html')
 
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
+    """
+    Wertet das Registrierungsformular aus. Bei validen Angaben wird ein neuer Arzt/Praxis angelegt.
+
+    :return: Login-Seite bei Erfolg, Registrierungsseite bei Misserfolg
+    """
     email = request.form.get('email')
     username = request.form.get('username')
     name = request.form.get('username')

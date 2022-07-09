@@ -114,6 +114,13 @@ def testfunc():
 @main.route("/patients", methods=["GET"])
 @login_required
 def patients():
+    """
+    Gibt die Gruppen-Ansicht aller Patienten zurück, für die der eingeloggte Benutzer eine Freigabe erhalten hat.
+    Für Patienten ist diese Seite nicht erreichbar, sie werden auf ihre Einzel-Ansicht umgeleitet.
+    Nicht eingeloggte Benutzer werden auf die Login-Seite umgeleitet.
+
+    :return: Patienten-Gruppen-Ansicht (Ärzte), Einzelansicht (Patienten), Login (nicht eingeloggte Benutzer)
+    """
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         patient_ids = getPatientsByClearance(current_user.username)
@@ -133,6 +140,13 @@ def patients():
 @main.route("/patients/<patient_id>", methods=["GET"])
 @login_required
 def patient(patient_id):
+    """
+    Gibt die Einzelansicht für einen Patienten zurück. Diese Seite ist nur für eingeloggte Benutzer verfügbar. Nicht
+    eingeloggte Benutzer werden auf die Login-Seite geleitet.
+
+    :param patient_id: Id des angefragten Patienten
+    :return: Patient-Einzel-Ansicht oder Login falls nicht eingeloggt
+    """
     p = fhir_interface.get_patient(patient_id)
     h = fhir_interface.get_height(patient_id)
     w = fhir_interface.get_weight(patient_id)
@@ -149,6 +163,12 @@ def patient(patient_id):
 @main.route("/patients/<patient_id>/edit", methods=["GET"])
 @login_required
 def patient_update(patient_id):
+    """
+    Zeigt die Änderungsseite für einen Patienten an. Benutzer muss eingeloggt sein.
+
+    :param patient_id: Id des Patienten
+    :return: Änderungsseite, bzw. Login
+    """
     # Nur Patienten haben hier Zugriff
     if current_user.practise:
         return redirect(url_for('main.patients'))
@@ -163,6 +183,13 @@ def patient_update(patient_id):
 @main.route("/patients/<patient_id>/edit", methods=["POST"])
 @login_required
 def patient_update_post(patient_id):
+    """
+    Wertet Änderungsformular für einen Benutzer aus. Bei invaliden Angaben wir das Formular erneut angezeigt mit einer
+    entsprechenden Fehlermeldung. Bei Erfolg wird die Einzelansicht des Patienten angezeigt.
+
+    :param patient_id:
+    :return: Patientenansicht bei Erfolg, sonst Änderungsansicht
+    """
     # Get form data
     patient = fhir_interface.get_patient(patient_id)
     firstname = request.form.get('first_name')
@@ -214,6 +241,13 @@ def patient_update_post(patient_id):
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["GET"])
 @login_required
 def patient_ecg(patient_id, ecg_id):
+    """
+    Detailansicht zu einem EKG für einen Patienten.
+
+    :param patient_id: Id des Patienten
+    :param ecg_id: Id des EKGs
+    :return: EKG-Ansicht, Login-Screen für nicht eingeloggte Nutzer
+    """
     p = fhir_interface.get_patient(patient_id)
     e = fhir_interface.get_observation(ecg_id)
     d = fhir_interface.get_diagnosis(ecg_id)
@@ -238,6 +272,13 @@ def patient_ecg(patient_id, ecg_id):
 @main.route("/patients/<patient_id>/ecg/<ecg_id>", methods=["POST"])
 @login_required
 def patient_ecg_post(patient_id, ecg_id):
+    """
+    Wertet das Änderungsformular für EKGs aus. Hier kann eine Diagnose zu einem EKG hinzugefügt oder geändert werden.
+
+    :param patient_id: Id des Patienten
+    :param ecg_id: Id des EKGs
+    :return: EKG-Seite
+    """
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         if request.form.get('diagnosis') == "OB":
@@ -270,6 +311,14 @@ def patient_new():
 @main.route("/patients/new", methods=["POST"])
 @login_required
 def patient_new_post():
+    """
+    Wertet das Formular zur Erstellung eines neuen Patienten aus. Bei ungültigen Angaben wird das Formular erneut
+    angezeigt. Bei Erfolg wird die Patienten-Gruppen-Ansicht für den erstellenden Arzt angezeigt.
+    Für nicht eingeloggte Benutzer und Patienten ist diese Seite nicht erreichbar.
+
+    :return: Patienten-Gruppen-Ansicht (Erfolg), Formular (Misserfolg), Einzel-Ansicht (Patienten),
+            Login (Falls nicht eingloggt)
+    """
     # Nur Ärzte haben hier Zugriff
     if current_user.practise:
         # Get form data
@@ -312,7 +361,3 @@ def patient_new_post():
                                     patient_id=fhir_id, patient_name=lastname + ", " + firstname, birth_date=birthdate))
     else:
         return redirect(url_for('main.patients'))
-
-
-def is_none_or_empty(string) -> bool:
-    return not string

@@ -12,9 +12,9 @@ import multiprocessing as mp
 
 main = Blueprint('main', __name__)
 
-url_base = 'http://192.168.85.121'
+url_base = 'http://localhost'
 fhir_url = url_base + ':8080/fhir'
-web_url = url_base + ':5001'
+web_url = url_base + ':5000'
 fhir_interface = FHIRInterface(fhir_url)
 
 username = "Max Mustermann"

@@ -14,12 +14,13 @@
         </nav>
 
         <!-- Patienten-Infos -->
-        <div><h3>Patient ID {{ patient.id }} | {{ patient.name[0].family }}, {{ patient.name[0].given[0] }} | {{ patient.birthDate }}</h3></div>
+        <div><h3>Patient ID {{ patient.id }} | {{ patient.name[0].family }}, {{ patient.name[0].given[0] }}
+            | {{ patient.birthDate }}</h3></div>
         <p></p>
 
         <!-- Gewicht, Größe -->
-        <p><b>Letzte Körpergröße: </b>{{height}}</p>
-        <p><b>Letztes Gewicht: </b>{{weight}}</p>
+        <p><b>Letzte Körpergröße: </b>{{ height }}</p>
+        <p><b>Letztes Gewicht: </b>{{ weight }}</p>
         <p><b>Letzte Aktualisierung: </b>{{ ecg.meta.lastUpdated.strftime("%Y-%m-%d %H:%M:%S") }}</p>
 
         <!-- EKG Visualisierung-->
@@ -36,102 +37,119 @@
         <hr>
         <p>Ärztliche Auswertung: </p>
         {% if user.practise == 1 %}
-        <form method="POST" action="/patients/{{ patient.id }}/ecg/{{ ecg.id }}">
+            <form method="POST" action="/patients/{{ patient.id }}/ecg/{{ ecg.id }}">
 
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="diagnosis" id="withoutFindings" value="OB" {%  if diagnosis_radio == 1 %}checked{%  endif %}>
-                <label class="form-check-label" for="withoutFindings">Ohne Befund</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="diagnosis" id="icd_code" value="ICD" {%  if diagnosis_radio == 2 %}checked{%  endif %}>
-                <label class="form-check-label" for="icd_code">ICD-10-GM Kodierung:</label>
-
-                <div id="icd_code_area" style="display: block;">
-                    <label class="form-label" for="icd_code_text"></label>
-                    <input type="text" id="icd_code_text" name="icd_code_text" value="{{ diagnosis }}" class="form-control"/>
-
-                    <label class="form-label" for="icd_code_meaning">Entspricht</label>
-                    <input type="text" id="icd_code_meaning" value="Vorhofflimmern" class="form-control" readonly/>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="diagnosis" id="withoutFindings" value="OB"
+                           {% if diagnosis_radio == 1 %}checked{% endif %}>
+                    <label class="form-check-label" for="withoutFindings">Ohne Befund</label>
                 </div>
-            </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="diagnosis" id="icd_code" value="ICD"
+                           {% if diagnosis_radio == 2 %}checked{% endif %}>
+                    <label class="form-check-label" for="icd_code">ICD-10-GM Kodierung:</label>
 
-            <input type="submit" class="btn btn-success btn-block my-4" value="Speichern"/>
-        </form>
+                    <div id="icd_code_area" style="display: block;">
+                        <label class="form-label" for="icd_code_text"></label>
+                        <input type="text" id="icd_code_text" name="icd_code_text" value="{{ diagnosis }}"
+                               class="form-control"/>
+
+                        <!--<label class="form-label" for="icd_code_meaning">Entspricht</label>
+                        <input type="text" id="icd_code_meaning" value="Vorhofflimmern" class="form-control" readonly/>-->
+                    </div>
+                </div>
+
+                <input type="submit" class="btn btn-success btn-lg my-4 float-right clearfix" value="Speichern"/>
+            </form>
         {% endif %}
 
         {% if user.practise == 0 %}
-        <p>ICD-10-GM Kodierung: <b>{{ diagnosis }}</b></p>
-        <p>Entspricht: - </p>
+            <p>ICD-10-GM Kodierung: <b>{{ diagnosis }}</b></p>
         {% endif %}
-
 
     </div>
 
-        <script>
-            // Ein/Ausblenden der ICD-Codes je nachdem, ob ein entsprechender Haken gesetzt ist
-            let toggle_icd_block = function () {
-                let icd_area = document.getElementById('icd_code_area');
-                let checked = document.getElementById('icd_code').checked;
-                if (checked) {
-                    icd_area.style.visibility = "visible";
-                } else {
-                    icd_area.style.visibility = "hidden";
-                }
-            };
+    <script>
+        $("#icd_code_text").autocomplete({
+            source: ["I48 Vorhofflimmern", "I48.0 Vorhofflimmern, paroxysmal", "I48.1 Vorhofflimmern, persistierend",
+                "I48.2 Vorhofflimmern, permanent", "I48.3 Vorhofflattern, typisch", "I48.4 Vorhofflattern, atypisch",
+                "I48.9 Vorhofflimmern und Vorhofflattern, nicht näher bezeichnet",
+                "I44.0 Atrioventrikulärer Block 1. Grades", "I44.1 Atrioventrikulärer Block 2. Grades",
+                "I44.2 Atrioventrikulärer Block 3. Grades",
+                "I44.3 Sonstiger und nicht näher bezeichneter atrioventrikulärer Block",
+                "I44.4 Linksanteriorer Faszikelblock", "I44.5 Linksposteriorer Faszikelblock",
+                "I44.6 Sonstiger und nicht näher bezeichneter Faszikelblock",
+                "I44.7 Linksschenkelblock, nicht näher bezeichnet", "I46 Herzstillstand"
+            ]
+        });
+    </script>
 
-            toggle_icd_block();
-            document.getElementById('icd_code').addEventListener("change", toggle_icd_block);
-            document.getElementById('withoutFindings').addEventListener("change", toggle_icd_block);
-        </script>
-
-        <script>
-            let c = document.getElementById("myCanvas");
-            let ctx = c.getContext("2d");
-
-            let data = {{ ecg_data }}
-
-            let height = 200;
-            c.height = height
-            let y_zero = height / 2.0;
-            let x = 0;
-            let period = 1.953125 / 5.0;
-            let y = y_zero;
-            let scaling = -100000;
-            c.width = period * 15360 + 10
-
-            for (let i = 1; i < 30; i++) {
-                ctx.strokeStyle = "rgb(205,207,210)";
-                ctx.lineWidth = 1
-                ctx.beginPath();
-                ctx.moveTo(period*i*15360/30, 0);
-                ctx.lineTo(period*i*15360/30, height);
-                ctx.closePath();
-                ctx.stroke();
-                ctx.strokeText(i + "s", period*i*15360/30 + 5, height*0.95);
+    <script>
+        // Ein/Ausblenden der ICD-Codes je nachdem, ob ein entsprechender Haken gesetzt ist
+        let toggle_icd_block = function () {
+            let icd_area = document.getElementById('icd_code_area');
+            let checked = document.getElementById('icd_code').checked;
+            if (checked) {
+                icd_area.style.visibility = "visible";
+            } else {
+                icd_area.style.visibility = "hidden";
             }
+        };
 
-            for (let i = 1; i < 10; i++) {
-                ctx.strokeStyle = "rgb(205,207,210)";
-                ctx.lineWidth = 1
-                ctx.beginPath();
-                ctx.moveTo(0, 0 - 0.0005*i*scaling);
-                ctx.lineTo(period*15360, 0 - 0.0005*i*scaling);
-                ctx.closePath();
-                ctx.stroke();
-            }
+        toggle_icd_block();
+        document.getElementById('icd_code').addEventListener("change", toggle_icd_block);
+        document.getElementById('withoutFindings').addEventListener("change", toggle_icd_block);
+    </script>
 
-            ctx.strokeStyle = "rgb(193,23,18)";
-            ctx.lineWidth = 2
-            ctx.moveTo(x, y);
-            for (element of data) {
-                x = x + period;
-                y = y_zero + element * scaling;
-                ctx.lineTo(x, y);
-            }
+    <script>
+        let c = document.getElementById("myCanvas");
+        let ctx = c.getContext("2d");
+
+        let data = {{ ecg_data }}
+
+            let
+        height = 200;
+        c.height = height
+        let y_zero = height / 2.0;
+        let x = 0;
+        let period = 1.953125 / 5.0;
+        let y = y_zero;
+        let scaling = -100000;
+        c.width = period * 15360 + 10
+
+        for (let i = 1; i < 30; i++) {
+            ctx.strokeStyle = "rgb(205,207,210)";
+            ctx.lineWidth = 1
+            ctx.beginPath();
+            ctx.moveTo(period * i * 15360 / 30, 0);
+            ctx.lineTo(period * i * 15360 / 30, height);
+            ctx.closePath();
             ctx.stroke();
-        </script>
+            ctx.strokeText(i + "s", period * i * 15360 / 30 + 5, height * 0.95);
+        }
+
+        for (let i = 1; i < 10; i++) {
+            ctx.strokeStyle = "rgb(205,207,210)";
+            ctx.lineWidth = 1
+            ctx.beginPath();
+            ctx.moveTo(0, 0 - 0.0005 * i * scaling);
+            ctx.lineTo(period * 15360, 0 - 0.0005 * i * scaling);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        ctx.strokeStyle = "rgb(193,23,18)";
+        ctx.lineWidth = 2
+        ctx.moveTo(x, y);
+        for (element of data) {
+            x = x + period;
+            y = y_zero + element * scaling;
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    </script>
 
 
-        {% include "footer.html" %}
+    {% include "footer.html" %}
 
 {% endblock %}

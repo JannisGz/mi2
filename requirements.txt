@@ -3,3 +3,7 @@ Werkzeug~=2.1.2
 SQLAlchemy~=1.4.39
 fhirpy~=1.3.0
 fhir~=0.0.4
+fhir.resources==6.4.0
+Flask-SQLAlchemy==2.5.1
+Flask-Login==0.6.1
+

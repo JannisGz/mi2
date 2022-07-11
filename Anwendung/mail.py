@@ -9,11 +9,20 @@ from email.utils import make_msgid
 
 gmail_user = "pulseappserver@gmail.com"
 gmail_pwd = "qzkigrfvlolpqwuz"
+#!ToDo Move password to a config file for production settings
 
 class Mail:
-
+    """
+    Klasse zum Erstellen und Senden von Emails über einen existierenden SMTP-Server
+    Hier Gmail mit Autorisierung über App-Tokens
+    """
 
     def send_mail(address, web_address):
+        """
+        :param username Nutzername des Patienten für den das Konto erstellt wurde
+        :web_address Die URL der Web-Anwendung
+        Schreiben und senden einer Mail, die die Parameter beinhaltet
+        """
         msg = EmailMessage()
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -39,6 +48,12 @@ class Mail:
             print(e)
 
     def send_mail_created(address, username, password, web_address):
+        """
+        :param username Nutzername des Patienten für den das Konto erstellt wurde
+        :param password das zugewiesene Passwort
+        :web_address Die URL der Web-Anwendung
+        Schreiben und senden einer Mail, die die Parameter beinhaltet
+        """
         msg = EmailMessage()
         try:
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)

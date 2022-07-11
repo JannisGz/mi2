@@ -22,6 +22,8 @@ class User(UserMixin, Model):
     telephone = Column(db.String(15), nullable=True)
 
 class Clearance(Model):
+    """ Database model for storing clearances using a pair of
+     usernames"""
     __tablename__ = 'clearances'
     id = Column(db.Integer, primary_key=True)
     username = Column(db.String(15), db.ForeignKey('user.username'))

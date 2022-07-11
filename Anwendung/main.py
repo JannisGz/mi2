@@ -62,6 +62,9 @@ def getPractisesByClearance(username):
 
 
 def setClearance(username, practisename):
+    """
+    Inverts the clearance currently set for pair of (patient:username, practise:username
+    """
     try:
         query = Clearance.query.filter_by(username=username, practisename=practisename).one()
         db.session.delete(query)
@@ -295,6 +298,10 @@ def patient_ecg_post(patient_id, ecg_id):
 @main.route("/patients/<patient_id>/help", methods=["GET"])
 @login_required
 def help_get(patient_id):
+    """
+    Zeigt die Hilfeseite an. Hier werden die Anleitung für das Erstellen von EKGs und synchronisieren mit Hilfe des
+    iPhones angezeigt.
+    """
     p = fhir_interface.get_patient(patient_id)
     return render_template('help.html', title="Anleitungen", user=current_user, patient=p, server_url=fhir_url)
 

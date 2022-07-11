@@ -5,7 +5,7 @@ from .extensions import db
 # init SQLAlchemy so we can use it later in our models
 def create_app():
     app = Flask(__name__)
-
+    #ToDo store Key in seperate config file, before using in production settings
     app.config['SECRET_KEY'] = 'secret-key-goes-here'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 

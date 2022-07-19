@@ -31,10 +31,10 @@ werden Benutzer und Freigaberechte geführt. Die medizinischen Daten der Patient
 werden im oben genannten FHIR-Server geführt.
 Zum Starten der Anwendung sind die folgenden Schritte notwendig:
 - Auf einer Konsole in das Hauptverzeichnis navigieren (mi2)
-- "python3 -m venv auth" ausführen (Erzeugt neue Ausführungsumgebung)
-- "source auth/bin/activate" ausführen (Wechselt zur erstellten Umgebung)
-- "pip install -r requirements.txt" ausführen (Installiert benötigte Module)
-- "export FLASK_APP=Anwendung" ausführen (Legt Name der zu startenden Anwendung fest)
-- "export FLASK_DEBUG=1" ausführen (Legt Debug-Level fest)
-- "flask run --host="0.0.0.0" ausführen (Startet den Server)
+- `python3 -m venv auth` ausführen (Erzeugt neue Ausführungsumgebung)
+- `source auth/bin/activate` ausführen (Wechselt zur erstellten Umgebung)
+- `pip install -r requirements.txt` ausführen (Installiert benötigte Module)
+- `export FLASK_APP=Anwendung` ausführen (Legt Name der zu startenden Anwendung fest)
+- `export FLASK_DEBUG=1` ausführen (Legt Debug-Level fest)
+- `flask run --host="0.0.0.0"` ausführen (Startet den Server)
 - Auf der Kommandozeile sollte ausgegeben werden unter welche Adresse die Login-Seite des Servers verfügbar ist

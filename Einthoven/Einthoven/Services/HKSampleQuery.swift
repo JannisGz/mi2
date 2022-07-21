@@ -56,7 +56,7 @@ class HKSampleQuery {
                                                 }
                                             } else {
                                                 print("No new matching samples \(self.sampleType.identifier) found")
-                                                closure((false, "no"));
+                                                closure((false, "Keine"));
                                             }
         }
         healthStore.execute(query)

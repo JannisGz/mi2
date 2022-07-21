@@ -27,12 +27,12 @@ struct ContentView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 250, height: 250)
-                    TextField("Server address", text: $serverAddress, onCommit: {
+                    TextField("FHIR Server Adresse", text: $serverAddress, onCommit: {
                         UserDefaultsProvider.setValueInUserDefaults(key: "serverAddress", value: self.serverAddress)
                     })
                         .multilineTextAlignment(.center)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    TextField("Patient reference", text: $patientReference, onCommit: {
+                    TextField("Patienten Referenz", text: $patientReference, onCommit: {
                         UserDefaultsProvider.setValueInUserDefaults(key: "patientReference", value: self.patientReference)
                     })
                         .multilineTextAlignment(.center)
@@ -50,14 +50,14 @@ struct ContentView: View {
                    
                     HKSynchronizer().Synchronize(type: ecgType, predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit) { (success) in
                         if (success.0) {
-                            text_ECG = success.1 + " ECG observation"
+                            text_ECG = success.1 + " EKG"
                             if (!success.1.contains("1")) {
                                 text_ECG.append("s")
                             }
-                            if (success.1.contains("failed")){
+                            if (success.1.contains("Fehler")){
                                 color_ECG = Color.red
                             }
-                            else if (success.1.contains("successfully")){
+                            else if (success.1.contains("Erfolg")){
                                 color_ECG = Color.green
                             }
                             else {
@@ -71,7 +71,7 @@ struct ContentView: View {
                 })
                 
             }) {
-                Text("Synchronize ECG records")
+                Text("EKGs Synchronisieren")
             }.foregroundColor(.white)
             .padding()
             .background(Color.accentColor)
@@ -90,19 +90,20 @@ struct ContentView: View {
                     let weightAnchor = HKAnchorProvider.GetAnchor(forType: weightType)
                     HKSynchronizer().Synchronize(type: weightType, predicate: nil, anchor: weightAnchor, limit: HKObjectQueryNoLimit) { success in
                         if (success.0) {
-                            text_weight = success.1 + " weight observation"
+                            text_weight = success.1 + " Beobachtung"
                             if (!success.1.contains("1")) {
-                                text_weight.append("s")
+                                text_weight.append("en")
                             }
-                            if (success.1.contains("failed")){
+                            if (success.1.contains("Fehler")){
                                 color_weight = Color.red
                             }
-                            else if (success.1.contains("successfully")){
+                            else if (success.1.contains("Erfolg")){
                                 color_weight = Color.green
                             }
                             else {
                                 color_weight = Color.black
                             }
+                            text_weight = text_weight + " - Körpergewicht"
                             print("All records synchronized")
                         } else {
                             print("There was an error during synchronization")
@@ -113,19 +114,20 @@ struct ContentView: View {
                     let heightAnchor = HKAnchorProvider.GetAnchor(forType: heightType)
                     HKSynchronizer().Synchronize(type: heightType, predicate: nil, anchor: heightAnchor, limit: HKObjectQueryNoLimit) { (success) in
                         if (success.0) {
-                            text_height = success.1 + " height observation"
+                            text_height = success.1 + " Beobachtung"
                             if (!success.1.contains("1")) {
-                                text_height.append("s")
+                                text_height.append("en")
                             }
-                            if (success.1.contains("failed")){
+                            if (success.1.contains("Fehler")){
                                 color_height = Color.red
                             }
-                            else if (success.1.contains("successfully")){
+                            else if (success.1.contains("Erfolg")){
                                 color_height = Color.green
                             }
                             else {
                                 color_height = Color.black
                             }
+                            text_height = text_height + " - Körpergröße"
                             print("All records synchronized")
                         } else {
                             print("There was an error during synchronization")
@@ -143,7 +145,7 @@ struct ContentView: View {
                 })
                 
             }) {
-                Text("Synchronize Patient Data")
+                Text("Größe & Gewicht Synchronisieren")
             }.foregroundColor(.white)
             .padding()
             .background(Color.accentColor)

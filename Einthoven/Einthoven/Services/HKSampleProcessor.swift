@@ -110,11 +110,11 @@ class HKSampleProcessor {
         for r in resources {
             client.send(resource: r){( success: Bool) in
                 if (!success) {
-                    self.success_client = "failed sending "
+                    self.success_client = "Fehler: "
                 }
                 count += 1
                 if ((self.success_client == "") && (count == resources.count)){
-                    self.success_client = "successfully sent "
+                    self.success_client = "Erfolg: "
                 }
             }
         }
